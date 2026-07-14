@@ -91,12 +91,19 @@ export default function SettingsClient({ store, members, isCollaborator, collabo
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)+/g, '')
 
+    const cleanPhone = storePhone.replace(/\s+/g, '')
+    if (!/^\+[1-9]\d{1,14}$/.test(cleanPhone)) {
+      setErrorMsg('El WhatsApp de contacto debe tener un formato internacional válido sin espacios (Ej. +51982432561).')
+      setSaving(false)
+      return
+    }
+
     const { error } = await supabase
       .from('stores')
       .update({
         name: storeName.trim(),
         slug: finalSlug,
-        whatsapp_phone: storePhone.trim(),
+        whatsapp_phone: cleanPhone,
         show_decimals: showDecimals,
         show_canceled_orders: showCanceledOrders,
         theme_settings: { primaryColor },
@@ -126,6 +133,7 @@ export default function SettingsClient({ store, members, isCollaborator, collabo
     } else {
       setSuccessMsg('Ajustes guardados con éxito.')
       setStoreSlug(finalSlug)
+      setStorePhone(cleanPhone)
     }
     setSaving(false)
   }
