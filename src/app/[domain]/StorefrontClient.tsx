@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useCart, CartItem } from '@/lib/store/useCart'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { getOptimizedImageUrl } from '@/lib/cloudinary'
 import {
   ShoppingBag,
   Search,
@@ -81,6 +82,7 @@ interface StorefrontClientProps {
     contact_email?: string | null
     address_details?: string | null
     description?: string | null
+    logo_url: string | null
   }
   categories: Category[]
   products: Product[]
@@ -355,8 +357,12 @@ export default function StorefrontClient({ store, categories, products, shipping
       <div className="md:hidden flex-1 flex flex-col w-full max-w-md mx-auto bg-white min-h-screen shadow-lg border-x border-slate-100 relative pb-20">
         {/* HEADER TIENDA */}
         <header className="p-6 text-center space-y-3 bg-slate-50 border-b border-slate-100 flex flex-col items-center">
-          <div className="w-14 h-14 rounded-full bg-[var(--tenant-primary)] text-white flex items-center justify-center font-black text-xl shadow-md border-2 border-white">
-            {store.name.charAt(0).toUpperCase()}
+          <div className="w-14 h-14 rounded-full bg-[var(--tenant-primary)] overflow-hidden shadow-md border-2 border-white flex items-center justify-center">
+            {store.logo_url ? (
+              <img src={getOptimizedImageUrl(store.logo_url, { width: 120, height: 120 })} alt={store.name} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-white font-black text-xl">{store.name.charAt(0).toUpperCase()}</span>
+            )}
           </div>
           <div>
             <h1 className="text-xl font-black text-slate-900 tracking-tight">{store.name}</h1>
@@ -422,7 +428,7 @@ export default function StorefrontClient({ store, categories, products, shipping
                 >
                   {prod.images[0] ? (
                     <img
-                      src={prod.images[0]}
+                      src={getOptimizedImageUrl(prod.images[0], { width: 160, height: 160 })}
                       alt={prod.title}
                       className="w-20 h-20 rounded-lg object-cover border border-slate-50 flex-shrink-0"
                     />
@@ -472,7 +478,14 @@ export default function StorefrontClient({ store, categories, products, shipping
           </div>
 
           {/* Nombre de la Tienda (Centro) */}
-          <div className="text-center">
+          <div className="flex items-center justify-center gap-2.5">
+            {store.logo_url && (
+              <img
+                src={getOptimizedImageUrl(store.logo_url, { width: 80, height: 80 })}
+                alt={store.name}
+                className="w-8 h-8 rounded-lg object-cover border border-slate-100 shadow-sm flex-shrink-0"
+              />
+            )}
             <h1 className="text-xl font-bold tracking-tight text-secondary text-[18px] uppercase">
               {store.name}
             </h1>
@@ -694,7 +707,7 @@ export default function StorefrontClient({ store, categories, products, shipping
                       {prod.images[0] ? (
                         <div className="w-full aspect-square relative bg-slate-50 overflow-hidden border-b border-slate-50">
                           <img 
-                            src={prod.images[0]} 
+                            src={getOptimizedImageUrl(prod.images[0], { width: 400, height: 400 })} 
                             alt={prod.title} 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
@@ -737,7 +750,7 @@ export default function StorefrontClient({ store, categories, products, shipping
                     <div className="flex items-center gap-4 min-w-0">
                       {prod.images[0] ? (
                         <img 
-                          src={prod.images[0]} 
+                          src={getOptimizedImageUrl(prod.images[0], { width: 120, height: 120 })} 
                           alt={prod.title} 
                           className="w-14 h-14 rounded-lg object-cover border border-slate-50 flex-shrink-0"
                         />

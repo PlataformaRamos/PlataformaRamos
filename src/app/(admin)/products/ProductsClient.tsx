@@ -53,8 +53,39 @@ export default function ProductsClient({ store, initialCategories, initialProduc
   const [prodImageUrl, setProdImageUrl] = useState('')
   const [prodAvailable, setProdAvailable] = useState(true)
   const [loadingProd, setLoadingProd] = useState(false)
+  const [uploadingProdImg, setUploadingProdImg] = useState(false)
 
   const supabase = createClient()
+
+  // Subir imagen del producto a R2
+  const handleUploadProductImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingProdImg(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('path', `stores/${store.id}/products`)
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Error al subir la imagen')
+      }
+
+      setProdImageUrl(data.url)
+    } catch (err: any) {
+      alert(err.message || 'Error al subir la imagen del producto.')
+    } finally {
+      setUploadingProdImg(false)
+    }
+  }
 
   // ----------------------------------------------------
   // GESTIÓN DE CATEGORÍAS
@@ -591,17 +622,78 @@ export default function ProductsClient({ store, initialCategories, initialProduc
                 </div>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <label className="block text-[10px] text-on-surface-variant uppercase tracking-wider">
-                  URL de Imagen (Pegar enlace)
+                  Foto del Producto
                 </label>
-                <input
-                  type="url"
-                  value={prodImageUrl}
-                  onChange={(e) => setProdImageUrl(e.target.value)}
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-admin-deep-blue text-xs bg-white font-medium"
-                />
+                
+                {prodImageUrl ? (
+                  <div className="relative w-full aspect-video rounded-xl bg-slate-50 border border-slate-200 overflow-hidden flex items-center justify-center group shadow-sm">
+                    <img 
+                      src={prodImageUrl} 
+                      alt="Vista previa del producto" 
+                      className="w-full h-full object-cover" 
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <label className="p-2 bg-white text-slate-800 rounded-full hover:bg-slate-100 transition-all cursor-pointer shadow">
+                        <span className="material-symbols-outlined text-[18px] block">upload</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleUploadProductImage}
+                          className="hidden"
+                          disabled={uploadingProdImg}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setProdImageUrl('')}
+                        className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all shadow"
+                      >
+                        <span className="material-symbols-outlined text-[18px] block">delete</span>
+                      </button>
+                    </div>
+                    {uploadingProdImg && (
+                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs font-bold gap-2">
+                        <span className="animate-spin material-symbols-outlined text-[18px]">progress_activity</span>
+                        <span>Subiendo...</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <label className={`w-full aspect-video rounded-xl border-2 border-dashed border-slate-300 hover:border-admin-deep-blue bg-slate-50/50 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${uploadingProdImg ? 'opacity-50 pointer-events-none' : ''}`}>
+                    {uploadingProdImg ? (
+                      <>
+                        <span className="animate-spin material-symbols-outlined text-slate-400 text-[24px]">progress_activity</span>
+                        <span className="text-slate-500 font-bold text-[11px]">Subiendo imagen...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-slate-400 text-[26px]">image</span>
+                        <span className="text-slate-600 font-bold text-[11px]">Subir foto de producto</span>
+                        <span className="text-[10px] text-slate-400 font-medium">Formatos soportados: PNG, JPG, WEBP</span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleUploadProductImage}
+                      className="hidden"
+                      disabled={uploadingProdImg}
+                    />
+                  </label>
+                )}
+
+                {/* Input de respaldo */}
+                <div className="pt-2">
+                  <input
+                    type="text"
+                    value={prodImageUrl}
+                    onChange={(e) => setProdImageUrl(e.target.value)}
+                    placeholder="O pega una URL de imagen directamente aquí..."
+                    className="w-full px-3 py-1.5 border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-admin-deep-blue text-[10px] bg-slate-50 font-mono font-medium text-slate-500"
+                  />
+                </div>
               </div>
 
               <div className="flex items-center gap-2 pt-2">

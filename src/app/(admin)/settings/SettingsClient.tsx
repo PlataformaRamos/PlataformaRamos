@@ -29,6 +29,7 @@ interface SettingsClientProps {
     receipt_settings: any
     payment_settings: any
     delivery_settings: any
+    logo_url: string | null
   }
   members: Member[]
   isCollaborator: boolean
@@ -43,6 +44,8 @@ export default function SettingsClient({ store, members, isCollaborator, collabo
   const [storeName, setStoreName] = useState(store.name)
   const [storeSlug, setStoreSlug] = useState(store.slug)
   const [storePhone, setStorePhone] = useState(store.whatsapp_phone)
+  const [logoUrl, setLogoUrl] = useState(store.logo_url || '')
+  const [uploadingLogo, setUploadingLogo] = useState(false)
   const [showDecimals, setShowDecimals] = useState(store.show_decimals)
   const [showCanceledOrders, setShowCanceledOrders] = useState(store.show_canceled_orders)
   const [primaryColor, setPrimaryColor] = useState(store.theme_settings?.primaryColor || '#3B82F6')
@@ -80,6 +83,40 @@ export default function SettingsClient({ store, members, isCollaborator, collabo
 
   const isUserAdmin = !isCollaborator || collaboratorRole === 'admin'
 
+  // Subir logo de la tienda a Cloudflare R2
+  const handleUploadLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingLogo(true)
+    setErrorMsg(null)
+    setSuccessMsg(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('path', `stores/${store.id}/logo`)
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Error al subir la imagen')
+      }
+
+      setLogoUrl(data.url)
+      setSuccessMsg('Logo subido correctamente (recuerda guardar los ajustes para confirmar).')
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error al subir el logo.')
+    } finally {
+      setUploadingLogo(false)
+    }
+  }
+
   // Guardar Cambios Generales, Ventas, Recibo, Pagos y Envíos
   const handleSaveSettings = async () => {
     setSaving(true)
@@ -104,6 +141,7 @@ export default function SettingsClient({ store, members, isCollaborator, collabo
         name: storeName.trim(),
         slug: finalSlug,
         whatsapp_phone: cleanPhone,
+        logo_url: logoUrl || null,
         show_decimals: showDecimals,
         show_canceled_orders: showCanceledOrders,
         theme_settings: { primaryColor },
@@ -261,6 +299,50 @@ export default function SettingsClient({ store, members, isCollaborator, collabo
               <div>
                 <h3 className="font-bold text-slate-900 text-lg">Identificación y Aspecto</h3>
                 <p className="text-xs text-on-surface-variant mt-0.5">Datos públicos de tu comercio e identidad de marca.</p>
+              </div>
+
+              {/* Cargador de Logo */}
+              <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl flex flex-col sm:flex-row items-center gap-5">
+                <div className="w-20 h-20 rounded-xl bg-white border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center relative flex-shrink-0 group">
+                  {logoUrl ? (
+                    <img src={logoUrl} alt="Logo de la tienda" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-2xl font-black text-slate-400 uppercase">{storeName.charAt(0)}</span>
+                  )}
+                  {uploadingLogo && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-[10px] font-bold">
+                      Subiendo...
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1.5 text-center sm:text-left">
+                  <h4 className="font-bold text-slate-800 text-sm">Logo del Comercio</h4>
+                  <p className="text-[11px] text-slate-500 font-medium max-w-sm">Recomendado: Imagen cuadrada (PNG o JPG) de al menos 200x200px.</p>
+                  <div className="flex gap-2 justify-center sm:justify-start items-center pt-1">
+                    <label className={`px-4 py-2 border border-slate-200 bg-white rounded-lg text-xs font-bold text-slate-700 hover:border-slate-300 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm ${!isUserAdmin || uploadingLogo ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <span className="material-symbols-outlined text-[16px]">upload</span>
+                      <span>Subir Logo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleUploadLogo}
+                        className="hidden"
+                        disabled={!isUserAdmin || uploadingLogo}
+                      />
+                    </label>
+                    {logoUrl && (
+                      <button
+                        onClick={() => setLogoUrl('')}
+                        type="button"
+                        className="px-3 py-2 border border-red-100 bg-red-50 text-red-600 rounded-lg text-xs font-bold hover:bg-red-100 transition-all flex items-center gap-1.5 shadow-sm"
+                        disabled={!isUserAdmin}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                        <span>Eliminar</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-semibold">
