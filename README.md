@@ -227,11 +227,58 @@ create table public.stores (
     plan_id text references public.plans(id) default 'free' not null, -- Clave externa a la tabla central de planes
     plan_expires_at timestamp with time zone,
     is_active boolean default true not null,
+    
+    -- Ajustes Generales y de Identificación (NUEVO)
+    owner_name text,                            -- Nombre del propietario de la tienda
+    tax_id text,                                -- RUT / CPF / CNPJ de identificación fiscal
+    logo_url text,                              -- Imagen de logotipo de marca
+    description text,                           -- Información de "Acerca de la tienda"
+    instagram_handle text,                      -- Enlace de Instagram
+    contact_email text,                         -- Correo de contacto
+    address_details text,                       -- Dirección física detallada
+    show_decimals boolean default true not null, -- Alternador de partes decimales en precios
+    show_canceled_orders text default 'strikethrough' not null, -- 'strikethrough' (mostrar tachado), 'hide' (esconder)
+
+    -- Ajustes de Pedidos, Ventas e Impuestos (NUEVO)
+    collect_sales_tax boolean default false not null, -- Flag para cobrar impuestos
+    sales_tax_rate numeric(5, 2) default 0.00 not null, -- Tasa de impuesto (porcentaje)
+    custom_order_statuses jsonb default '[
+        {"id": "pending", "label": "Pendiente", "enabled": true},
+        {"id": "confirmed", "label": "Confirmado", "enabled": true},
+        {"id": "paid", "label": "Pagado", "enabled": true},
+        {"id": "preparing", "label": "Preparando el pedido", "enabled": true},
+        {"id": "ready_shipping", "label": "Listo para entrega", "enabled": true},
+        {"id": "shipped", "label": "En camino", "enabled": true},
+        {"id": "ready_pickup", "label": "Listo para recoger", "enabled": true}
+    ]'::jsonb not null,                         -- Estados personalizados de pedidos y toggles
+
+    -- Ajustes de Impresión de Recibos (NUEVO)
+    receipt_settings jsonb default '{
+        "receipt_notes": "",
+        "show_customer_info": false,
+        "show_product_code": false,
+        "header_text": "",
+        "footer_text": ""
+    }'::jsonb not null,                         -- Formatos y visualización de ticket de compra
+
+    -- Ajustes de Pagos y Métodos de Cobro (NUEVO)
+    payment_settings jsonb default '{
+        "allow_pay_later": true,
+        "store_credit_enabled": true
+    }'::jsonb not null,                         -- Métodos activos y switch de "pagar más tarde"
+
+    -- Ajustes de Métodos de Entrega y Recogida (NUEVO)
+    delivery_settings jsonb default '{
+        "allow_pickup": true,
+        "allow_delivery": true
+    }'::jsonb not null,                         -- Permite recogida local y/o entrega a domicilio
+
     created_at timestamp with time zone default timezone('utc'::text, now()) not null,
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
     
     constraint store_slug_format check (slug ~* '^[a-z0-9-]+$'),
-    constraint store_whatsapp_phone_format check (whatsapp_phone ~* '^\+[1-9]\d{1,14}$') -- E.164 formato
+    constraint store_whatsapp_phone_format check (whatsapp_phone ~* '^\+[1-9]\d{1,14}$'), -- E.164 formato
+    constraint store_show_canceled_orderscheck check (show_canceled_orders in ('strikethrough', 'hide'))
 );
 
 create index idx_stores_slug on public.stores(slug);
@@ -779,18 +826,58 @@ El panel del vendedor (`app.tuplataforma.com`) estará estructurado en **5 secci
     *   Botón *"Llamar"* (enlace `tel:`): Inicia una llamada telefónica directa.
     *   *Notas Internas:* Campo de texto editable para agregar observaciones (ej. "Cliente VIP", "Entrega en portería con el celador").
 
-### 5. Ajustes y Personalización de Tienda
-*   **Datos de Contacto:** Modificación de WhatsApp receptor (`whatsapp_phone`), slug URL (subdominio) y datos de marca.
-*   **Diseño Estético:** 
-    *   Selector de plantilla activa (`template_name` de `stores`).
-    *   Paleta de colores (color primario, secundario, de fondo) y fuentes tipográficas validadas en el JSON `theme_settings`, que alimentan las variables CSS del catálogo final.
-*   **Gestión de Colaboradores (Equipo):**
-    *   **Panel de Invitaciones:** Formulario para enviar invitaciones de colaboración ingresando un correo electrónico y seleccionando el rol.
-    *   **Matriz de Permisos por Rol:**
-        *   **Administrador (`admin`):** Acceso completo al panel, incluyendo configuraciones críticas de tienda (Slug, WhatsApp, plantillas), facturación y capacidad para invitar, editar o revocar colaboradores de la tabla `store_members`.
-        *   **Editor (`editor`):** Permiso para gestionar el catálogo (productos, categorías, variantes), editar tarifas de envío (`shipping_rules`) y modificar estados de pedidos (`status` en `orders`). Bloqueado para configuraciones globales de la tienda e invitaciones.
-        *   **Lector (`viewer`):** Acceso 100% de solo lectura para monitoreo de ventas, métricas y pedidos. Bloqueado para cualquier acción de creación, modificación o eliminación.
-    *   **Bandeja de Miembros:** Lista visual que muestra los correos invitados, su estado (`pending` / `active`) y opción de eliminación/revocación de acceso reservada para administradores y dueños.
+### 5. Ajustes y Personalización Avanzada (Configuración de Negocio)
+Esta sección se compone de **6 subsecciones y pestañas interactivas** dedicadas a la parametrización de la tienda y la marca:
+
+#### Subsección A: General (Identificación, Contacto y Visualización)
+*   **Bloque Identificación:**
+    *   Formulario para cambiar el Nombre de la empresa (`name`), Nombre del propietario (`owner_name`) y registro fiscal (`tax_id` / RUT / CPF).
+    *   **Selector de Logotipo de Marca:** Área de arrastre de imágenes para subir y procesar el logotipo (subida directa a Cloudinary).
+    *   *Acerca de la tienda:* Caja de texto enriquecido para información comercial adicional de contacto/horarios.
+*   **Bloque Datos de Contacto:**
+    *   Configuración del número de WhatsApp/móvil receptor de pedidos, Instagram, Correo electrónico y número secundario.
+*   **Bloque Dirección:**
+    *   Campos de Dirección física y detalles para geolocalización.
+*   **Bloque Divisa y Moneda:**
+    *   Selector interactivo de moneda base de la tienda y un interruptor (switch toggle) para habilitar/deshabilitar partes decimales en precios.
+*   **Bloque Opciones de Visualización:**
+    *   Alternador para pedidos cancelados: opción para mostrarlos tachados o esconderlos por completo de los listados rápidos.
+
+#### Subsección B: Pedidos y Ventas (Impuestos y Estados)
+*   **Configuración de Impuestos:**
+    *   Interruptor para activar "Cobrar el Impuesto sobre las ventas" y caja numérica para especificar la tasa/tasa porcentual aplicable.
+*   **Estado del Pedido (Matriz Dinámica):**
+    *   Gestor visual de los estados por los que transita un pedido: `Pendiente`, `Confirmado`, `Pagado`, `Preparando el pedido`, `Listo para entrega`, `En camino` y `Listo para recoger`.
+    *   Interruptores (switch toggles) al lado de cada estado para habilitar o deshabilitar ese paso específico en el flujo logístico de la tienda.
+    *   **Botón `Agregar nuevo estado`:** Abre un formulario para crear estados personalizados si el comercio tiene un flujo único (ej: "En horno", "Empacado").
+
+#### Subsección C: Recibo (Personalización de Ticket)
+*   **Ajustes de Impresión:**
+    *   Cajas de texto para agregar **Encabezado** del recibo, **Pie de página** y **Notas del recibo**.
+    *   Toggles para: "Mostrar información del cliente" (nombre, dirección) y "Mostrar código de producto" (SKU).
+*   **Simulador de Ticket (Vista Previa en Vivo):**
+    *   Componente de UI interactivo a la derecha que dibuja un ticket de compra con borde dentado clásico. Actualiza dinámicamente el contenido (encabezado, pie de página, notas) en tiempo real según el vendedor escribe en el formulario, mostrando el cálculo simulado de subtotal, envío e impuestos.
+
+#### Subsección D: Pagos (Métodos y Cobros)
+*   **Pagos para Organizar:**
+    *   Activar/desactivar el método de "Crédito de la tienda" (saldo a favor de clientes recurrentes).
+*   **Integraciones Activas:**
+    *   Configurar enlaces de pago de la pasarela local (TPV), Pagos automáticos y Lectores físicos de tarjetas.
+*   **Permitir a los clientes pagar más tarde:**
+    *   Interruptor (toggle) que habilita que el cliente final reserve el pedido a través del catálogo sin pagar de inmediato (pago contra entrega o transferencia manual).
+
+#### Subsección E: Recogida y Entrega (Logística de Envío)
+*   **Configuración de Métodos:**
+    *   Toggles individuales para activar/desactivar la opción de **Recogida local** (Takeaway) y **Entrega a domicilio** (Delivery) en el checkout del cliente.
+    *   Integración con la tabla de tarifas `shipping_rules` para modular los costos correspondientes a la opción de envío a domicilio.
+
+#### Subsección F: Gestión de Colaboradores (Equipo)
+*   **Panel de Invitaciones:** Formulario para enviar invitaciones de colaboración ingresando un correo electrónico y seleccionando el rol.
+*   **Matriz de Permisos por Rol:**
+    *   **Administrador (`admin`):** Acceso completo al panel, incluyendo todas las subsecciones de ajustes (General, Pedidos, Recibos, Pagos, Logística), facturación y capacidad para invitar, editar o revocar colaboradores de la tabla `store_members`.
+    *   **Editor (`editor`):** Permiso para gestionar el catálogo (productos, categorías, variantes), editar tarifas de envío (`shipping_rules`) y modificar estados de pedidos (`status` en `orders`). Bloqueado para subsección de ajustes globales e invitaciones de equipo.
+    *   **Lector (`viewer`):** Acceso 100% de solo lectura para monitoreo de ventas, métricas y pedidos. Bloqueado para cualquier acción de creación, modificación o eliminación.
+*   **Bandeja de Miembros:** Lista visual que muestra los correos invitados, su estado (`pending` / `active`) y opción de eliminación/revocación de acceso reservada para administradores y dueños.
 
 ---
 
