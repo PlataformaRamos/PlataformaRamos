@@ -675,6 +675,14 @@ create policy "Los dueños o colaboradores autorizados pueden ver items de pedid
             where orders.id = order_items.order_id and public.is_store_collaborator(orders.store_id, 'viewer')
         )
     );
+
+-- ----------------------------------------------------
+-- HABILITACIÓN DE TIEMPO REAL (Supabase Realtime CDC)
+-- ----------------------------------------------------
+-- Agregar tablas críticas a la publicación de tiempo real de Supabase para WebSocket
+alter publication supabase_realtime add table public.orders;
+alter publication supabase_realtime add table public.products;
+alter publication supabase_realtime add table public.stores;
 ```
 
 ---
@@ -720,6 +728,9 @@ graph TD
 9. **Modelo de Suscripción (Monetización):** El lanzamiento inicial será 100% gratuito para captar usuarios. No obstante, las bases de datos contarán con las columnas `plan_type` y `plan_expires_at` estructuradas en la tabla `stores` para facilitar la migración automática a un esquema Free/Premium en el futuro.
 10. **Envío de Correos y Notificaciones (Resend):** Se utilizará **Resend** como proveedor de correos electrónicos transaccionales para gestionar el flujo de registro, confirmaciones de cuentas de vendedores y alertas críticas del sistema.
 11. **Estrategia de Autenticación (Supabase Auth - Email & Google):** El registro y acceso de los vendedores a su consola administrativa se gestionará de manera segura usando **Supabase Auth**. Se habilitará el inicio de sesión con **Correo Electrónico (Email)** clásico (con opción de verificación de cuenta) y el login social **Google OAuth**. Los flujos de redirección tras el inicio de sesión se configurarán dinámicamente utilizando el parámetro `redirectTo` para redirigir al vendedor de vuelta a `app.tuplataforma.com/dashboard` (o su homólogo local en desarrollo).
+12. **Sincronización Reactiva en Tiempo Real (Realtime CDC):** Para lograr una experiencia reactiva en vivo, la plataforma utilizará **Supabase Realtime WebSockets** (Change Data Capture). 
+    *   *Bandeja de Pedidos:* La consola del vendedor se suscribirá en tiempo real a los eventos `INSERT` de la tabla `orders` para reflejar al instante nuevos pedidos con alertas auditivas sin recargar.
+    *   *Catálogo Público:* La página del cliente final (`/[domain]`) se suscribirá a los cambios de `products` y `stores` para actualizar en vivo el stock, precios y cambios estéticos tan pronto como el vendedor los modifique en el panel.
 
 ---
 
