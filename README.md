@@ -385,6 +385,33 @@ create table public.order_items (
 create index idx_order_items_order_id on public.order_items(order_id);
 
 -- ----------------------------------------------------
+-- AUTOMATIZACIÓN DE AUTENTICACIÓN (Supabase Auth a Profiles)
+-- ----------------------------------------------------
+-- Función trigger para crear automáticamente el perfil público del vendedor
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+    insert into public.profiles (id, full_name, avatar_url, role)
+    values (
+        new.id,
+        coalesce(
+            new.raw_user_meta_data->>'full_name',
+            new.raw_user_meta_data->>'name',
+            'Nuevo Vendedor'
+        ),
+        new.raw_user_meta_data->>'avatar_url',
+        'user'
+    );
+    return new;
+end;
+$$ language plpgsql security definer;
+
+-- Trigger asociado a la inserción en auth.users de Supabase
+create trigger on_auth_user_created
+    after insert on auth.users
+    for each row execute function public.handle_new_user();
+
+-- ----------------------------------------------------
 -- POLÍTICAS DE SEGURIDAD (RLS) NATIVAS EN SUPABASE
 -- ----------------------------------------------------
 
@@ -585,6 +612,7 @@ graph TD
 8. **Moneda y Localización:** Se soportará multi-moneda a nivel de tienda mediante un campo `currency_code` (ISO 4217) configurable en los ajustes de la tienda. El renderizado y formateo de precios en los catálogos dinámicos se realizará en el cliente usando la API nativa de JavaScript `Intl.NumberFormat`.
 9. **Modelo de Suscripción (Monetización):** El lanzamiento inicial será 100% gratuito para captar usuarios. No obstante, las bases de datos contarán con las columnas `plan_type` y `plan_expires_at` estructuradas en la tabla `stores` para facilitar la migración automática a un esquema Free/Premium en el futuro.
 10. **Envío de Correos y Notificaciones (Resend):** Se utilizará **Resend** como proveedor de correos electrónicos transaccionales para gestionar el flujo de registro, confirmaciones de cuentas de vendedores y alertas críticas del sistema.
+11. **Estrategia de Autenticación (Supabase Auth - Email & Google):** El registro y acceso de los vendedores a su consola administrativa se gestionará de manera segura usando **Supabase Auth**. Se habilitará el inicio de sesión con **Correo Electrónico (Email)** clásico (con opción de verificación de cuenta) y el login social **Google OAuth**. Los flujos de redirección tras el inicio de sesión se configurarán dinámicamente utilizando el parámetro `redirectTo` para redirigir al vendedor de vuelta a `app.tuplataforma.com/dashboard` (o su homólogo local en desarrollo).
 
 ---
 
@@ -657,10 +685,19 @@ RESEND_API_KEY=re_your_resend_api_key
 NEXT_PUBLIC_ROOT_DOMAIN=tuplataforma.com
 ```
 
-### 2. Seguridad en Onboarding y Prevención de Conflictos de Ruta
-Para evitar colisiones de rutas del sistema con los subdominios de inquilinos en el middleware, implementaremos una lista estricta de **Slugs Reservados** en el flujo de registro/creación de tienda.
-*   **Lista de palabras reservadas:** `app`, `www`, `api`, `admin`, `assets`, `static`, `support`, `sitemap`, `robots`, `help`, `billing`, `legal`, `terms`, `privacy`, `dev`.
-*   **Restricción por base de datos:** Añadir un constraint check o validación en el trigger de inserción/esquema Zod para rechazar slugs que coincidan con esta lista.
+### 2. Seguridad en Onboarding, Proveedores de Autenticación y Conflictos de Ruta
+El registro y creación de cuentas de nuevos vendedores se gestionará mediante **Supabase Auth** de la siguiente manera:
+
+*   **Proveedores de Identidad (Auth Providers):**
+    *   **Email y Contraseña:** Registro estándar donde el vendedor ingresa sus credenciales y el sistema envía un correo de confirmación de cuenta a través del conector de **Resend**.
+    *   **Google OAuth:** Botón de registro rápido "Iniciar sesión con Google". Supabase Auth redirigirá al vendedor al flujo oficial de Google OAuth.
+*   **Triggers de Sincronización Automática:** Cuando un usuario se registra con éxito (vía Email o Google), el trigger de PostgreSQL `on_auth_user_created` inyectará inmediatamente sus datos (ID, nombre completo y foto de perfil provenientes de la cuenta de Google) en la tabla `public.profiles`.
+*   **Configuración de Redirecciones Permitidas (Redirect URLs):** En el panel web de Supabase Auth, se deben dar de alta las siguientes direcciones de retorno para procesar los tokens de sesión de forma segura:
+    *   *Local (Desarrollo):* `http://localhost:3000/auth/callback`
+    *   *Producción:* `https://app.tuplataforma.com/auth/callback`
+*   **Seguridad de Rutas (Slugs Reservados):** Para evitar colisiones de rutas del sistema con los subdominios de inquilinos en el middleware, implementaremos una lista estricta de **Slugs Reservados** en el flujo de registro/creación de tienda.
+    *   *Lista de palabras reservadas:* `app`, `www`, `api`, `admin`, `assets`, `static`, `support`, `sitemap`, `robots`, `help`, `billing`, `legal`, `terms`, `privacy`, `dev`.
+    *   *Restricción por base de datos:* El trigger de validación de base de datos y la validación de esquemas Zod en el frontend rechazarán slugs que coincidan con esta lista.
 
 ### 3. Estrategia de Renderizado CSS para Plantillas Rígidas (Evitar Cumulative Layout Shift)
 Para aplicar de forma segura las configuraciones visuales del vendedor (`theme_settings` con colores primarios, secundarios, etc.) sin sufrir parpadeos (Flash of Unstyled Content / FOUC) en el cliente final:
