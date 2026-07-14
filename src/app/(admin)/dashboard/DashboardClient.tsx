@@ -125,9 +125,9 @@ export default function DashboardClient({ store, initialMetrics, planLimits }: D
       {/* Cabecera del Dashboard */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-admin-deep-blue">Visión General</h2>
-          <p className="text-sm text-on-surface-variant mt-1">
-            Monitoriza en vivo el rendimiento de tu tienda <span className="font-semibold text-primary">{store.name}</span>
+          <h2 className="font-headline-lg text-headline-lg text-admin-deep-blue mb-2">Visión General</h2>
+          <p className="font-body-base text-body-base text-on-surface-variant">
+            Monitoriza el rendimiento de tu tienda <span className="font-semibold text-primary">{store.name}</span> de un vistazo.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -148,53 +148,57 @@ export default function DashboardClient({ store, initialMetrics, planLimits }: D
         </div>
       </div>
 
-      {/* Tarjetas KPI Bento Grid (Diseño de Stitch) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Ventas */}
-        <div className="bg-surface border border-border-subtle rounded-lg p-6 flex flex-col justify-between h-40">
+      {/* Metrics Bento Grid (Diseño exacto de Stitch) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Ventas Totales */}
+        <div className="bg-surface border border-border-subtle rounded-lg p-6 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Ventas Totales</span>
+            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Ventas Totales</span>
             <div className="p-2 bg-secondary-container/10 text-secondary rounded-full flex">
               <span className="material-symbols-outlined text-[20px]">payments</span>
             </div>
           </div>
           <div>
-            <span className="text-3xl font-bold tracking-tight text-admin-deep-blue">{formatCurrency(metrics.totalSales)}</span>
-            <p className="text-xs text-status-completed flex items-center mt-2 font-semibold">
+            <span className="font-headline-lg text-headline-lg text-admin-deep-blue">
+              {formatCurrency(metrics.totalSales)}
+            </span>
+            <p className="font-body-sm text-body-sm text-status-completed flex items-center mt-2">
               <span className="material-symbols-outlined text-[16px] mr-1">trending_up</span>
               +15% vs mes anterior
             </p>
           </div>
         </div>
 
-        {/* Pedidos */}
-        <div className="bg-surface border border-border-subtle rounded-lg p-6 flex flex-col justify-between h-40">
+        {/* Pedidos Nuevos */}
+        <div className="bg-surface border border-border-subtle rounded-lg p-6 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Pedidos Nuevos</span>
+            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Pedidos Nuevos</span>
             <div className="p-2 bg-secondary-container/10 text-secondary rounded-full flex">
               <span className="material-symbols-outlined text-[20px]">shopping_bag</span>
             </div>
           </div>
           <div>
-            <span className="text-3xl font-bold tracking-tight text-admin-deep-blue">{metrics.totalOrders}</span>
-            <p className="text-xs text-status-completed flex items-center mt-2 font-semibold">
+            <span className="font-headline-lg text-headline-lg text-admin-deep-blue">
+              {metrics.totalOrders}
+            </span>
+            <p className="font-body-sm text-body-sm text-status-completed flex items-center mt-2">
               <span className="material-symbols-outlined text-[16px] mr-1">trending_up</span>
               +5% vs mes anterior
             </p>
           </div>
         </div>
 
-        {/* Conversión */}
-        <div className="bg-surface border border-border-subtle rounded-lg p-6 flex flex-col justify-between h-40">
+        {/* Tasa de Conversión */}
+        <div className="bg-surface border border-border-subtle rounded-lg p-6 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Ticket Promedio</span>
+            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Tasa de Conversión</span>
             <div className="p-2 bg-secondary-container/10 text-secondary rounded-full flex">
               <span className="material-symbols-outlined text-[20px]">analytics</span>
             </div>
           </div>
           <div>
-            <span className="text-3xl font-bold tracking-tight text-admin-deep-blue">{formatCurrency(ticketAverage)}</span>
-            <p className="text-xs text-status-canceled flex items-center mt-2 font-semibold">
+            <span className="font-headline-lg text-headline-lg text-admin-deep-blue">3.2%</span>
+            <p className="font-body-sm text-body-sm text-status-canceled flex items-center mt-2">
               <span className="material-symbols-outlined text-[16px] mr-1">trending_down</span>
               -0.5% vs mes anterior
             </p>
@@ -202,19 +206,19 @@ export default function DashboardClient({ store, initialMetrics, planLimits }: D
         </div>
       </div>
 
-      {/* Gráfico y Pedidos Urgentes Split (Diseño de Stitch) */}
+      {/* Chart & Recent Orders Split (Diseño exacto de Stitch) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Gráfico de Ventas Semanales */}
-        <div className="lg:col-span-2 bg-surface border border-border-subtle rounded-lg p-6 flex flex-col h-[400px] justify-between">
+        {/* Weekly Sales Chart Area */}
+        <div className="lg:col-span-2 bg-surface border border-border-subtle rounded-lg p-6 flex flex-col h-[400px]">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold text-admin-deep-blue">Ventas Semanales</h3>
-            <select className="bg-surface-container-low border border-border-subtle rounded px-3 py-1 text-xs text-on-surface-variant focus:outline-none">
+            <h3 className="font-headline-md text-headline-md text-admin-deep-blue">Ventas Semanales</h3>
+            <select className="bg-surface-container-low border border-border-subtle rounded px-3 py-1 font-body-sm text-body-sm text-on-surface-variant focus:ring-secondary focus:border-secondary focus:outline-none">
               <option>Esta semana</option>
               <option>Semana pasada</option>
             </select>
           </div>
-          {/* Gráfico simulado */}
+
           <div className="flex-1 bg-surface-container-lowest border border-border-subtle border-dashed rounded flex items-center justify-center relative overflow-hidden">
             <div className="absolute inset-0 flex items-end justify-around px-4 pb-4 opacity-50">
               <div className="w-12 bg-secondary/20 rounded-t h-[40%]"></div>
@@ -225,82 +229,65 @@ export default function DashboardClient({ store, initialMetrics, planLimits }: D
               <div className="w-12 bg-secondary/20 rounded-t h-[30%]"></div>
               <div className="w-12 bg-secondary/60 rounded-t h-[80%]"></div>
             </div>
-            <span className="text-xs text-on-surface-variant z-10 bg-surface px-4 py-2 rounded shadow-sm border border-border-subtle font-bold">
-              Gráfico en Tiempo Real
+            <span className="font-body-sm text-body-sm text-on-surface-variant z-10 bg-surface px-4 py-2 rounded shadow-sm border border-border-subtle font-bold">
+              Gráfico interactivo aquí
             </span>
           </div>
         </div>
 
-        {/* Pedidos Urgentes / Recientes */}
+        {/* Recent Orders List */}
         <div className="lg:col-span-1 bg-surface border border-border-subtle rounded-lg flex flex-col h-[400px]">
           <div className="p-6 border-b border-border-subtle flex justify-between items-center">
-            <h3 className="text-lg font-bold text-admin-deep-blue">Pedidos Urgentes</h3>
-            <span className="px-2 py-0.5 bg-amber-500/10 text-amber-600 border border-amber-500/20 rounded text-[9px] font-bold uppercase">
-              {pendingOrders.length} pendientes
-            </span>
+            <h3 className="font-headline-md text-headline-md text-admin-deep-blue">Pedidos Recientes</h3>
+            <Link href="/orders" className="font-body-sm text-body-sm text-secondary hover:underline">
+              Ver todos
+            </Link>
           </div>
 
-          <div className="flex-1 overflow-y-auto divide-y divide-border-subtle">
+          <div className="flex-1 overflow-y-auto">
             {pendingOrders.length === 0 ? (
               <div className="text-center py-16 text-slate-400 flex flex-col items-center justify-center h-full">
                 <span className="material-symbols-outlined text-[40px] text-slate-200 mb-2">task_alt</span>
                 <div className="font-bold text-xs text-slate-700">¡Todo al día!</div>
-                <p className="text-[10px] text-slate-500 mt-1">No hay pedidos por atender.</p>
+                <p className="text-[10px] text-slate-500 mt-1">No hay nuevos pedidos.</p>
               </div>
             ) : (
-              pendingOrders.map((order, index) => {
-                const whatsappMessage = `Hola ${order.customer_name}, coordinemos los detalles de tu pedido de ${formatCurrency(order.total)}.`
-                const whatsappLink = `https://api.whatsapp.com/send?phone=${order.customer_phone.replace('+', '')}&text=${encodeURIComponent(whatsappMessage)}`
-                return (
-                  <div 
+              <ul className="divide-y divide-border-subtle">
+                {pendingOrders.map((order, index) => (
+                  <li 
                     key={order.id} 
-                    className={`p-4 flex justify-between items-center hover:bg-surface-container-lowest transition-colors ${
+                    className={`p-4 hover:bg-surface-container-lowest transition-colors flex justify-between items-center ${
                       index % 2 === 1 ? 'bg-[#F8FAFC]' : ''
                     }`}
                   >
                     <div>
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-xs font-bold text-admin-deep-blue">{order.customer_name}</p>
-                        <span className="text-[9px] font-mono text-slate-400">#{order.id.slice(0, 5)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <a 
-                          href={whatsappLink} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-0.5 text-[10px] text-emerald-600 font-bold hover:underline"
-                        >
-                          <span className="material-symbols-outlined text-[12px]">chat</span>
-                          <span>WhatsApp</span>
-                        </a>
-                        <span className="text-slate-300">|</span>
-                        <button 
-                          onClick={() => handleUpdateOrderStatus(order.id, 'completed')}
-                          className="text-[10px] text-secondary font-bold hover:underline"
-                        >
-                          Despachar
-                        </button>
-                      </div>
+                      <p className="font-body-base text-body-base font-bold text-admin-deep-blue">
+                        #ORD-{order.id.slice(0, 4).toUpperCase()}
+                      </p>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        {order.customer_name}
+                      </p>
                     </div>
-
                     <div className="flex flex-col items-end">
-                      <span className="font-bold text-xs text-primary mb-1">{formatCurrency(order.total)}</span>
-                      <span className="px-2 py-0.5 rounded bg-status-pending/10 text-status-pending font-bold text-[9px] uppercase tracking-wider border border-status-pending/20">
+                      <span className="font-price-display text-price-display text-primary mb-1">
+                        {formatCurrency(order.total)}
+                      </span>
+                      <span className="px-2 py-1 rounded bg-status-pending/10 text-status-pending font-label-caps text-[10px] uppercase font-bold tracking-wider">
                         Pendiente
                       </span>
                     </div>
-                  </div>
-                )
-              })
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>
       </div>
 
-      {/* Caja de consumo del Plan (Filtro base) */}
+      {/* Caja de consumo del Plan (Consola) */}
       <div className="bg-surface border border-border-subtle rounded-lg p-6 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="space-y-1">
-          <h4 className="text-sm font-bold text-admin-deep-blue">Consumo de Plan - {planLimits.planName}</h4>
+          <h4 className="font-headline-md text-body-base font-semibold text-admin-deep-blue">Consumo de Plan - {planLimits.planName}</h4>
           <p className="text-xs text-on-surface-variant">Límite de productos activos en tu tienda.</p>
         </div>
         <div className="flex items-center gap-4 w-full md:max-w-md">
