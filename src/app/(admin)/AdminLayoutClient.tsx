@@ -38,6 +38,10 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
     window.location.href = '/login'
   }
 
+  const publicStoreUrl = store 
+    ? `http://${store.slug}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'localhost:3000'}`
+    : '#'
+
   const isActiveLink = (href: string) => {
     return pathname.startsWith(href)
   }
@@ -46,11 +50,22 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
     <div className="h-full flex flex-col justify-between bg-surface dark:bg-inverse-surface py-6 px-4">
       <div className="space-y-6">
         {/* Cabecera del Panel */}
-        <div className="px-3 mb-2">
+        <div className="px-3 mb-2 flex flex-col gap-1">
           <h1 className="text-xl font-bold tracking-tight text-primary dark:text-primary-fixed">Admin Panel</h1>
-          <p className="text-xs text-on-surface-variant">
+          <p className="text-xs text-on-surface-variant font-semibold">
             {store ? store.name : 'Plataforma Ramos'}
           </p>
+          {store && (
+            <a 
+              href={publicStoreUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1.5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-secondary-container/10 hover:bg-secondary-container/20 text-secondary text-[10px] font-bold rounded transition-colors w-fit border border-secondary/15"
+            >
+              <span className="material-symbols-outlined text-[13px]">open_in_new</span>
+              <span>Visitar mi Tienda</span>
+            </a>
+          )}
         </div>
 
         {/* Menú de Navegación */}

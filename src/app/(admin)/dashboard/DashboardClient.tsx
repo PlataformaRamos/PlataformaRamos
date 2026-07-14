@@ -118,6 +118,8 @@ export default function DashboardClient({ store, initialMetrics, planLimits }: D
 
   const planPercentage = Math.min((planLimits.currentProducts / planLimits.maxProducts) * 100, 100)
 
+  const publicStoreUrl = `http://${store.slug}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'localhost:3000'}`
+
   return (
     <div className="space-y-8 font-body-base text-on-surface">
       {/* Cabecera del Dashboard */}
@@ -128,9 +130,21 @@ export default function DashboardClient({ store, initialMetrics, planLimits }: D
             Monitoriza en vivo el rendimiento de tu tienda <span className="font-semibold text-primary">{store.name}</span>
           </p>
         </div>
-        <div className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Conectado en Vivo</span>
+        <div className="flex items-center gap-3">
+          <a 
+            href={publicStoreUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 bg-white border border-border-subtle rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all flex items-center gap-2 shadow-sm h-9"
+          >
+            <span className="material-symbols-outlined text-[16px]">storefront</span>
+            <span>Visitar Tienda Pública</span>
+          </a>
+
+          <div className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded flex items-center gap-2 h-9">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Conectado en Vivo</span>
+          </div>
         </div>
       </div>
 
