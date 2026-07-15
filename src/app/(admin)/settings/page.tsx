@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import SettingsClient from './SettingsClient'
 
 export default async function SettingsPage() {
@@ -46,8 +47,14 @@ export default async function SettingsPage() {
   if (!store && !isCollaborator) {
     const defaultSlug = `tienda-${user.email?.split('@')[0].replace(/[^a-z0-9]/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`
     
-    // Insertar tienda por defecto en Supabase
-    const { data: newStore, error } = await supabase
+    // Crear cliente administrativo de Supabase para saltar RLS en el INSERT
+    const adminSupabase = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+
+    // Insertar tienda por defecto
+    const { data: newStore, error } = await adminSupabase
       .from('stores')
       .insert({
         owner_id: user.id,
@@ -65,6 +72,10 @@ export default async function SettingsPage() {
       })
       .select()
       .single()
+
+    if (error) {
+      console.error('Error insertando tienda automática de onboarding:', error)
+    }
 
     if (!error && newStore) {
       store = newStore

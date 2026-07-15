@@ -2,12 +2,25 @@ import React from 'react'
 import Link from 'next/link'
 import { ShoppingBag, MessageSquare, Zap, Shield, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react'
 
+import { redirect } from 'next/navigation'
+
 export const metadata = {
   title: 'Comercio Ligero - Crea tu Catálogo Digital y Vende por WhatsApp',
   description: 'La plataforma SaaS más rápida para crear tu catálogo web interactivo, recibir pedidos directamente en tu WhatsApp y administrar tu negocio sin comisiones.',
 }
 
-export default function HomePage() {
+interface HomePageProps {
+  searchParams: Promise<{ code?: string; error?: string }>
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const resolvedParams = await searchParams
+  
+  // Redirección de emergencia para OAuth de Supabase
+  if (resolvedParams.code) {
+    redirect(`/api/auth/callback?code=${resolvedParams.code}`)
+  }
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white overflow-x-hidden">
       
