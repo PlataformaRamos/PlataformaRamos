@@ -287,8 +287,8 @@ export default function ProductDetailClient({ store, product, categories }: Prod
               </div>
             )}
 
-            {/* Selectores de Cantidad y Botón de Compra */}
-            <div className="pt-5 border-t border-slate-100 space-y-4 mt-auto">
+            {/* Controles de Compra (Escritorio - oculto en móvil) */}
+            <div className="pt-5 border-t border-slate-100 space-y-4 mt-auto hidden md:block">
               <div className="flex items-center justify-between gap-4">
                 <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Cantidad</span>
                 <div className="flex items-center border border-slate-200 rounded-xl bg-white shadow-sm">
@@ -341,6 +341,52 @@ export default function ProductDetailClient({ store, product, categories }: Prod
           </div>
         </div>
       </main>
+
+      {/* Barra de Compra Flotante Fija para Celulares (Estilo Shopify/Kyte) */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md border-t border-slate-100 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] z-40 flex md:hidden items-center justify-between gap-4 max-w-md mx-auto rounded-t-2xl">
+        <div className="flex flex-col">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Total</span>
+          <span className="text-base font-black text-slate-900 leading-none mt-0.5">{formatPrice(totalPrice)}</span>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {/* Selector de cantidad compacto */}
+          <div className="flex items-center border border-slate-200 rounded-xl bg-slate-50 shadow-sm">
+            <button
+              onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+              className="p-2 text-slate-500 rounded-l-xl"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
+            <span className="w-6 text-center text-xs font-black text-slate-800">{quantity}</span>
+            <button
+              onClick={() => setQuantity(quantity + 1)}
+              className="p-2 text-slate-500 rounded-r-xl"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Botón interactivo */}
+          <button
+            onClick={handleAddToCart}
+            style={{ backgroundColor: addedToCart ? '#10b981' : primaryColor }}
+            className="text-white font-extrabold px-5 py-3 rounded-xl flex items-center justify-center gap-1.5 shadow-md text-xs cursor-pointer min-w-[130px] transition-all"
+          >
+            {addedToCart ? (
+              <>
+                <Check className="w-4 h-4" />
+                <span>¡Agregado!</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="w-4 h-4" />
+                <span>Añadir</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
