@@ -9,8 +9,9 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl
   const host = request.headers.get('host') || ''
 
-  // Normalizar el host (remover puerto en entorno de desarrollo local)
-  const hostname = host.split(':')[0]
+  // Normalizar el host (remover puerto y prefijo www. para evitar bucles)
+  const rawHostname = host.split(':')[0]
+  const hostname = rawHostname.replace(/^www\./, '')
   const path = url.pathname
 
   // Omitir peticiones internas y recursos estáticos
@@ -26,8 +27,11 @@ export async function middleware(request: NextRequest) {
   const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'localhost:3000'
   const rootDomainName = rootDomain.split(':')[0]
 
-  // Comprobar pertenencia al dominio principal y subdominio de consola app.*
-  const isRootDomain = hostname === rootDomainName || hostname === 'localhost'
+  // Comprobar pertenencia al dominio principal y subdominios del sistema
+  const isRootDomain = 
+    hostname === rootDomainName || 
+    hostname === 'localhost' || 
+    hostname === 'plataforma-ramos.vercel.app'
   const isConsoleDomain = hostname.startsWith('app.')
 
   if (isConsoleDomain) {
