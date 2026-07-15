@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import React, { useState, useEffect, useCallback } from 'react'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { Link } from 'next-view-transitions'
 import { useCart, CartItem } from '@/lib/store/useCart'
 import { createClient } from '@/lib/supabase/client'
@@ -136,12 +136,36 @@ export default function StorefrontClient({ store, categories, products, shipping
   const cart = useCart()
   const supabase = createClient()
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  // Helper profesional: limpia ?cart=open de la URL sin recargar la página
+  const cleanCartParam = useCallback(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('cart=open')) {
+      const url = new URL(window.location.href)
+      url.searchParams.delete('cart')
+      // Si no quedan params, usar solo el pathname
+      const cleanUrl = url.searchParams.toString()
+        ? `${pathname}?${url.searchParams.toString()}`
+        : pathname
+      router.replace(cleanUrl, { scroll: false })
+    }
+  }, [pathname, router])
+
+  // Función centralizada para cerrar el carrito
+  const closeCart = useCallback(() => {
+    setIsCartOpen(false)
+    setIsCheckoutStep(false)
+    cleanCartParam()
+  }, [cleanCartParam])
 
   useEffect(() => {
     if (searchParams && searchParams.get('cart') === 'open') {
       setIsCartOpen(true)
+      // Limpiar inmediatamente el param de la URL tras leerlo
+      cleanCartParam()
     }
-  }, [searchParams])
+  }, [searchParams, cleanCartParam])
 
   // Sincronizar el primer método de envío si hay reglas
   useEffect(() => {
@@ -926,7 +950,7 @@ export default function StorefrontClient({ store, categories, products, shipping
       {/* 6. DRAWER DE CARRITO & CHECKOUT */}
       {isCartOpen && (
         <div className="fixed inset-0 z-40 flex justify-center bg-black/60">
-          <div className="fixed inset-0 bg-transparent" onClick={() => setIsCartOpen(false)} />
+          <div className="fixed inset-0 bg-transparent" onClick={closeCart} />
           <div className="relative bg-white w-full max-w-md h-full flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl">
             
             {/* Cabecera */}
@@ -939,7 +963,7 @@ export default function StorefrontClient({ store, categories, products, shipping
                   if (isCheckoutStep) {
                     setIsCheckoutStep(false)
                   } else {
-                    setIsCartOpen(false)
+                    closeCart()
                   }
                 }} 
                 className="p-1 rounded-full text-slate-400 hover:bg-slate-200"
