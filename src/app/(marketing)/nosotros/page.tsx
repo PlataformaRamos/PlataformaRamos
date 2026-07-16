@@ -8,30 +8,30 @@ export const metadata = {
 
 export default function NosotrosPage() {
   return (
-    <main className="flex-1 bg-slate-950 py-24 relative overflow-hidden">
+    <main className="flex-1 bg-white py-24 relative overflow-hidden">
       {/* Glows de fondo */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 w-[400px] h-[400px] bg-red-600/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/[0.03] rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 w-[400px] h-[400px] bg-red-600/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
       <div className="w-full max-w-4xl mx-auto px-6 relative z-10">
         <div className="text-center max-w-2xl mx-auto space-y-4 mb-16">
-          <span className="text-xs font-bold text-blue-500 uppercase tracking-widest block font-bold">Nuestra Historia</span>
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight">Sobre Plataforma Ramos</h1>
-          <p className="text-sm text-slate-400 max-w-xs mx-auto">Digitalizando e-commerce locales sin barreras técnicas ni comisiones abusivas.</p>
+          <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block font-bold">Nuestra Historia</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">Sobre Plataforma Ramos</h1>
+          <p className="text-sm text-slate-550 max-w-xs mx-auto">Digitalizando e-commerce locales sin barreras técnicas ni comisiones abusivas.</p>
         </div>
 
-        <div className="space-y-12 text-sm text-slate-400 leading-relaxed font-medium">
+        <div className="space-y-12 text-sm text-slate-600 leading-relaxed font-medium">
           {/* Misión y Visión */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-6 bg-slate-900 border border-slate-800 rounded-3xl space-y-3">
-              <h2 className="text-lg font-bold text-white">Nuestra Misión</h2>
+            <div className="p-6 bg-slate-50 border border-slate-200 rounded-3xl space-y-3">
+              <h2 className="text-lg font-bold text-slate-900">Nuestra Misión</h2>
               <p className="text-xs">
                 Empoderar a pequeños comerciantes, emprendedores y marcas consolidadas brindándoles las herramientas necesarias para digitalizar su inventario de forma estética, rápida y económica, optimizando la comunicación de venta directa con sus clientes a través de WhatsApp.
               </p>
             </div>
             
-            <div className="p-6 bg-slate-900 border border-slate-800 rounded-3xl space-y-3">
-              <h2 className="text-lg font-bold text-white">Nuestra Visión</h2>
+            <div className="p-6 bg-slate-50 border border-slate-200 rounded-3xl space-y-3">
+              <h2 className="text-lg font-bold text-slate-900">Nuestra Visión</h2>
               <p className="text-xs">
                 Convertirnos en la plataforma SaaS líder de comercio directo en Latinoamérica, facilitando la descentralización de las ventas digitales y proveyendo un ecosistema libre de comisiones donde la experiencia visual y la simpleza de cierre de ventas sean el motor de crecimiento de cada negocio.
               </p>
@@ -39,9 +39,9 @@ export default function NosotrosPage() {
           </div>
 
           {/* Valores */}
-          <div className="p-8 bg-slate-900/50 border border-slate-800 rounded-3xl space-y-6">
-            <h2 className="text-xl font-bold text-white text-center md:text-left">Nuestros Valores Fundamentales</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-300 font-bold">
+          <div className="p-8 bg-slate-50 border border-slate-200 rounded-3xl space-y-6">
+            <h2 className="text-xl font-bold text-slate-900 text-center md:text-left">Nuestros Valores Fundamentales</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-700 font-bold">
               {[
                 { title: 'Transparencia Absoluta', desc: 'Sin comisiones ocultas sobre tus ventas. Lo que vendes es 100% tuyo.' },
                 { title: 'Diseño Centrado en el Usuario', desc: 'UIs hermosas, rápidas y fluidas optimizadas especialmente para dispositivos móviles.' },

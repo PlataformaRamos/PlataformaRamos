@@ -8,16 +8,16 @@ export const metadata = {
 
 export default function FAQPage() {
   return (
-    <main className="flex-1 bg-slate-950 py-24 relative overflow-hidden">
+    <main className="flex-1 bg-white py-24 relative overflow-hidden">
       {/* Glows de fondo */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 w-[400px] h-[400px] bg-red-600/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/[0.03] rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 w-[400px] h-[400px] bg-red-600/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
       <div className="w-full max-w-3xl mx-auto px-6 relative z-10">
         <div className="text-center max-w-2xl mx-auto space-y-4 mb-16">
-          <span className="text-xs font-bold text-blue-500 uppercase tracking-widest block font-bold">Resuelve tus dudas</span>
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight">Preguntas frecuentes</h1>
-          <p className="text-sm text-slate-400 max-w-xs mx-auto">¿Tienes dudas? Aquí te las respondemos al instante.</p>
+          <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block font-bold">Resuelve tus dudas</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">Preguntas frecuentes</h1>
+          <p className="text-sm text-slate-505 max-w-xs mx-auto">¿Tienes dudas? Aquí te las respondemos al instante.</p>
         </div>
 
         <div className="space-y-4 text-xs font-semibold">
@@ -43,12 +43,12 @@ export default function FAQPage() {
               a: 'Puedes aceptar cualquier medio de pago que coordines directamente con el cliente: transferencias bancarias, Yape, Plin, efectivo contra entrega o links de pago de pasarelas locales (como Niubiz, MercadoPago, etc.).'
             }
           ].map((item, index) => (
-            <div key={index} className="p-6 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
-              <h3 className="font-bold text-white text-sm flex justify-between items-center">
+            <div key={index} className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+              <h3 className="font-bold text-slate-900 text-sm flex justify-between items-center">
                 <span>{item.q}</span>
-                <ChevronDown className="w-4 h-4 text-slate-500" />
+                <ChevronDown className="w-4 h-4 text-slate-400" />
               </h3>
-              <p className="text-slate-400 font-medium leading-relaxed mt-2">{item.a}</p>
+              <p className="text-slate-650 font-medium leading-relaxed mt-2">{item.a}</p>
             </div>
           ))}
         </div>

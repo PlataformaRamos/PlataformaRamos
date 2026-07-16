@@ -6,31 +6,31 @@ import Logo from '@/components/marketing/Logo'
 
 export default function Header() {
   return (
-    <header className="w-full bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/40 sticky top-0 z-50">
+    <header className="w-full bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <Logo size={44} className="group-hover:scale-105 transition-transform" />
-          <span className="font-black text-xl tracking-tight bg-gradient-to-r from-white via-blue-100 to-red-100 bg-clip-text text-transparent">
+          <span className="font-black text-xl tracking-tight text-slate-900">
             Plataforma Ramos
           </span>
         </Link>
 
         {/* Navigation */}
-        <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-slate-400">
-          <Link href="/caracteristicas" className="hover:text-white transition-colors">
+        <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-slate-600">
+          <Link href="/caracteristicas" className="hover:text-blue-600 transition-colors">
             Características
           </Link>
-          <Link href="/como-funciona" className="hover:text-white transition-colors">
+          <Link href="/como-funciona" className="hover:text-blue-600 transition-colors">
             Cómo Funciona
           </Link>
-          <Link href="/precios" className="hover:text-white transition-colors">
+          <Link href="/precios" className="hover:text-blue-600 transition-colors">
             Precios
           </Link>
-          <Link href="/faq" className="hover:text-white transition-colors">
+          <Link href="/faq" className="hover:text-blue-600 transition-colors">
             Preguntas
           </Link>
-          <Link href="/nosotros" className="hover:text-white transition-colors">
+          <Link href="/nosotros" className="hover:text-blue-600 transition-colors">
             Nosotros
           </Link>
         </nav>
@@ -39,13 +39,13 @@ export default function Header() {
         <div className="flex items-center gap-4">
           <Link 
             href="/login" 
-            className="text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white transition-colors"
+            className="text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-blue-600 transition-colors"
           >
             Ingresar
           </Link>
           <Link 
             href="/login" 
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-xs font-extrabold uppercase tracking-wider rounded-xl text-white shadow-lg shadow-blue-600/20 transition-all hover:scale-105 active:scale-95 border border-white/10"
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-xs font-extrabold uppercase tracking-wider rounded-xl text-white shadow-lg shadow-blue-600/10 transition-all hover:scale-105 active:scale-95 border border-blue-500/20"
           >
             Crear Tienda
           </Link>
