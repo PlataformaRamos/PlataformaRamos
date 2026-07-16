@@ -3,6 +3,17 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
+  
+  // Capturar errores enviados directamente en la query por Supabase Auth (ej. cuenta ya existe con otro proveedor)
+  const errorName = searchParams.get('error')
+  const errorDesc = searchParams.get('error_description')
+  if (errorName) {
+    console.error('Error de Supabase Auth en callback:', errorName, errorDesc)
+    return NextResponse.redirect(
+      `${origin}/login?error=${encodeURIComponent(errorName)}&description=${encodeURIComponent(errorDesc || '')}`
+    )
+  }
+
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/dashboard'
 
@@ -26,7 +37,6 @@ export async function GET(request: Request) {
       }
       
       if (attempt < 3) {
-        // Pausa de 200ms entre intentos para dar holgura a la conexión
         await new Promise(resolve => setTimeout(resolve, 200))
       }
     }
@@ -35,6 +45,9 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${origin}${next}`)
     } else {
       console.error('Error definitivo al intercambiar código por sesión tras 3 intentos:', lastError)
+      // Si el error del intercambio es por cuenta existente u otro error conocido, lo pasamos
+      const errMsg = lastError?.message || lastError?.description || 'auth-callback-failed'
+      return NextResponse.redirect(`${origin}/login?error=auth-callback-failed&description=${encodeURIComponent(errMsg)}`)
     }
   }
 

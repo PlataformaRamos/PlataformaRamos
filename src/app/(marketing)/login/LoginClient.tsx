@@ -12,6 +12,7 @@ export default function LoginClient() {
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode')
   const errorParam = searchParams.get('error')
+  const descParam = searchParams.get('description')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -19,6 +20,7 @@ export default function LoginClient() {
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isSignUp, setIsSignUp] = useState(false)
+  const [isEmailTaken, setIsEmailTaken] = useState(false)
 
   const supabase = createClient()
 
@@ -29,33 +31,63 @@ export default function LoginClient() {
     } else {
       setIsSignUp(false)
     }
+    // Limpiar alertas al cambiar de modo
+    setError(null)
+    setMessage(null)
+    setIsEmailTaken(false)
   }, [mode])
 
+  // Manejar errores devueltos por redirección de Google OAuth / Supabase
   useEffect(() => {
-    if (errorParam === 'auth-callback-failed') {
-      setError('Tuvimos un inconveniente al conectar con tu cuenta de Google por un problema temporal de red. Por favor, intenta presionar "Acceder con Google" nuevamente para ingresar de inmediato.')
+    if (errorParam) {
+      setIsEmailTaken(false)
+      const descText = descParam ? decodeURIComponent(descParam).toLowerCase() : ''
+      const errText = errorParam.toLowerCase()
+      
+      if (errText.includes('identity_already_exists') || descText.includes('already exists') || descText.includes('email_taken')) {
+        setError('Ya existe una cuenta con este correo electrónico (posiblemente creada con contraseña). Por favor, inicia sesión escribiendo tu correo y contraseña, o restablece tu clave si no la recuerdas.')
+      } else if (errText === 'auth-callback-failed') {
+        setError('Tuvimos un inconveniente al conectar con tu cuenta de Google por un problema temporal de red. Por favor, intenta de nuevo presionando "Acceder con Google".')
+      } else {
+        setError(descParam ? decodeURIComponent(descParam) : 'No pudimos autenticar tu cuenta. Inténtalo de nuevo.')
+      }
     }
-  }, [errorParam])
+  }, [errorParam, descParam])
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setMessage(null)
     setError(null)
+    setIsEmailTaken(false)
 
     try {
       if (isSignUp) {
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/api/auth/callback`,
           },
         })
+        
         if (signUpError) {
-          setError(signUpError.message)
+          const errMsg = signUpError.message.toLowerCase()
+          // Capturar si la cuenta ya existe
+          if (errMsg.includes('already registered') || errMsg.includes('already exists') || errMsg.includes('email_taken')) {
+            setIsEmailTaken(true)
+          } else {
+            setError(signUpError.message)
+          }
         } else {
-          setMessage('¡Registro completado! Revisa tu bandeja de correo para confirmar tu cuenta y continuar.')
+          // Nota: Supabase a veces no devuelve error de seguridad por privacidad de enumeración,
+          // pero si data.user existe y data.user.identities es un array vacío, significa que el email ya está registrado
+          const userIdentities = data?.user?.identities
+          if (userIdentities && userIdentities.length === 0) {
+            setIsEmailTaken(true)
+          } else {
+            setMessage('¡Registro completado! Revisa tu bandeja de correo para confirmar tu cuenta y continuar.')
+          }
         }
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -78,6 +110,7 @@ export default function LoginClient() {
   const handleGoogleLogin = async () => {
     setLoading(true)
     setError(null)
+    setIsEmailTaken(false)
     try {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -170,9 +203,33 @@ export default function LoginClient() {
             />
           </div>
 
+          {/* Alerta de Email Ya Existente (Sign Up -> Sign In) */}
+          {isEmailTaken && (
+            <div className="p-4 bg-blue-50 border border-blue-200/60 rounded-2xl space-y-2.5 text-slate-700 animate-in zoom-in-95 duration-200">
+              <div className="flex items-center gap-2 text-blue-700 font-black">
+                <AlertCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                <span>Esta cuenta ya existe</span>
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+                El correo <strong>{email}</strong> ya está registrado en Plataforma Ramos. Puedes iniciar sesión de inmediato escribiendo tu contraseña.
+              </p>
+              <Button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(false)
+                  setIsEmailTaken(false)
+                  setError(null)
+                }}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-[10px] h-9 transition-all active:scale-[0.98]"
+              >
+                Iniciar sesión en su lugar
+              </Button>
+            </div>
+          )}
+
           {/* Mensajes de Error con animación de escala */}
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200/60 rounded-xl text-red-600 flex items-start gap-2.5 font-medium animate-in zoom-in-95 duration-200">
+            <div className="p-3 bg-red-50 border border-red-200/60 rounded-xl text-red-600 flex items-start gap-2.5 font-medium animate-in zoom-in-95 duration-200 leading-normal">
               <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -180,7 +237,7 @@ export default function LoginClient() {
 
           {/* Mensaje de Éxito */}
           {message && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200/60 rounded-xl text-emerald-700 flex items-start gap-2.5 font-medium animate-in zoom-in-95 duration-200">
+            <div className="p-3 bg-emerald-50 border border-emerald-200/60 rounded-xl text-emerald-700 flex items-start gap-2.5 font-medium animate-in zoom-in-95 duration-200 leading-normal">
               <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
               <span>{message}</span>
             </div>
@@ -250,6 +307,7 @@ export default function LoginClient() {
               setIsSignUp(!isSignUp)
               setError(null)
               setMessage(null)
+              setIsEmailTaken(false)
             }}
             className="text-xs text-slate-500 hover:text-blue-600 transition-colors font-bold"
           >
