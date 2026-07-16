@@ -10,10 +10,12 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
-          <Logo size={44} className="group-hover:scale-105 transition-transform" />
-          <span className="font-black text-xl tracking-tight text-slate-900">
-            Plataforma Ramos
+          <Logo size={40} className="group-hover:scale-105 transition-transform" />
+          <span className="font-black text-xl tracking-tight flex items-center gap-1.5 select-none">
+            <span className="text-[#EF4444]">Plataforma</span>
+            <span className="text-[#3B82F6]">Ramos</span>
           </span>
+          <Logo size={40} className="group-hover:scale-105 transition-transform" />
         </Link>
 
         {/* Navigation */}
