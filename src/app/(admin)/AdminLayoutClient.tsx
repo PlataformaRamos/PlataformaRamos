@@ -12,6 +12,7 @@ interface AdminLayoutClientProps {
   profile: {
     full_name: string
     avatar_url: string | null
+    role?: string
   }
   store: {
     id: string
@@ -34,6 +35,10 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
     { name: 'Clientes', href: '/customers', icon: 'group' },
     { name: 'Ajustes', href: '/settings', icon: 'settings' },
   ]
+
+  if (profile.role === 'super_admin') {
+    navigation.push({ name: 'Panel Master', href: '/master', icon: 'shield' })
+  }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -109,7 +114,9 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
           )}
           <div className="min-w-0 flex-1 text-xs">
             <div className="font-bold text-slate-900 truncate">{profile.full_name}</div>
-            <div className="text-on-surface-variant truncate">Vendedor</div>
+            <div className="text-on-surface-variant truncate">
+              {profile.role === 'super_admin' ? 'Super Admin' : 'Vendedor'}
+            </div>
           </div>
         </div>
 

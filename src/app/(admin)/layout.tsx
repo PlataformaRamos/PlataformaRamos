@@ -49,7 +49,7 @@ export default async function AdminLayout({
 
   return (
     <AdminLayoutClient 
-      profile={profile || { full_name: 'Vendedor', avatar_url: null }} 
+      profile={profile || { full_name: 'Vendedor', avatar_url: null, role: 'user' }} 
       store={store}
     >
       {children}
