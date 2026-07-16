@@ -2,17 +2,15 @@
 
 import React from 'react'
 import { Link } from 'next-view-transitions'
-import { ShoppingBag } from 'lucide-react'
+import Logo from '@/components/marketing/Logo'
 
 export default function Header() {
   return (
     <header className="w-full bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/40 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-red-500 flex items-center justify-center text-white shadow-lg shadow-blue-600/30 group-hover:scale-105 transition-transform">
-            <ShoppingBag className="w-5.5 h-5.5" />
-          </div>
+        <Link href="/" className="flex items-center gap-3 group">
+          <Logo size={44} className="group-hover:scale-105 transition-transform" />
           <span className="font-black text-xl tracking-tight bg-gradient-to-r from-white via-blue-100 to-red-100 bg-clip-text text-transparent">
             Plataforma Ramos
           </span>
