@@ -52,7 +52,7 @@ export default function PreciosPage() {
             </div>
 
             <Link 
-              href="/login" 
+              href="/login?mode=signup" 
               className="w-full py-3.5 bg-slate-200 hover:bg-slate-300 text-center font-bold text-slate-800 rounded-xl transition-colors"
             >
               Comenzar gratis
@@ -92,7 +92,7 @@ export default function PreciosPage() {
             </div>
 
             <Link 
-              href="/login" 
+              href="/login?mode=signup" 
               className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-center font-bold text-white rounded-xl shadow-lg shadow-blue-600/10 transition-all hover:scale-105 active:scale-95"
             >
               Adquirir Premium

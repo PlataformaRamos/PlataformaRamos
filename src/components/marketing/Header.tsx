@@ -40,13 +40,13 @@ export default function Header() {
         {/* CTAs */}
         <div className="flex items-center gap-4">
           <Link 
-            href="/login" 
+            href="/login?mode=signin" 
             className="text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-blue-600 transition-colors"
           >
             Ingresar
           </Link>
           <Link 
-            href="/login" 
+            href="/login?mode=signup" 
             className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-xs font-extrabold uppercase tracking-wider rounded-xl text-white shadow-lg shadow-blue-600/10 transition-all hover:scale-105 active:scale-95 border border-blue-500/20"
           >
             Crear Tienda

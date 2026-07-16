@@ -49,7 +49,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
             <Link 
-              href="/login" 
+              href="/login?mode=signup" 
               className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold tracking-wider uppercase shadow-lg shadow-blue-600/10 flex items-center justify-center gap-2 transition-all hover:scale-[1.03] active:scale-95 group"
             >
               <span className="text-white font-black">Empezar Gratis Ahora</span>
