@@ -29,7 +29,7 @@ export default function PreciosPage() {
               <div>
                 <h3 className="text-base font-bold text-slate-900 uppercase tracking-wider">Plan Inicial</h3>
                 <div className="flex items-baseline gap-1 mt-3">
-                  <span className="text-4xl font-black text-slate-900">$0</span>
+                  <span className="text-4xl font-black text-slate-900">S/ 0</span>
                   <span className="text-slate-500 font-bold">/ mes</span>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-2 font-medium">Ideal para emprendedores y nuevos negocios.</p>
@@ -69,7 +69,7 @@ export default function PreciosPage() {
               <div>
                 <h3 className="text-base font-bold text-slate-900 uppercase tracking-wider">Plan Premium</h3>
                 <div className="flex items-baseline gap-1 mt-3">
-                  <span className="text-4xl font-black text-slate-900">$9.90</span>
+                  <span className="text-4xl font-black text-slate-900">S/ 39.90</span>
                   <span className="text-blue-600 font-bold">/ mes</span>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-2 font-medium">Para comercios establecidos y marcas consolidadas.</p>
