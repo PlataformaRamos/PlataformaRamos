@@ -1,29 +1,19 @@
-# Tareas — Rediseño UI/UX Premium Storefront
+# Tareas — Reestructuración de Landing Page a Sub-rutas
 
-## Fase 1 — Móvil Premium
-- [ ] 1.1 Header móvil compacto con glassmorphism
-- [ ] 1.2 Grid de productos en 2 columnas (estilo Shopify)
-- [ ] 1.3 Categorías mejoradas con gradient fade
-- [ ] 1.4 Barra flotante de carrito mejorada
-- [ ] 1.5 Botón flotante de WhatsApp
-
-## Fase 2 — Desktop Profesional
-- [ ] 2.1 Header desktop unificado en español
-- [ ] 2.2 Eliminar sidebar, layout full-width con categorías inline
-- [ ] 2.3 Grid de productos desktop premium
-- [ ] 2.4 Footer profesional multi-columna
-
-## Fase 3 — Animaciones y Microinteracciones
-- [ ] 3.1 Animaciones de entrada de productos (staggered fade-in)
-- [ ] 3.2 Transición suave del carrito drawer
-- [ ] 3.3 Hover states premium en desktop
-
-## Fase 4 — Checkout y Página de Producto
-- [ ] 4.1 Checkout drawer con indicador de paso
-- [ ] 4.2 Galería swipeable en ProductDetailClient
-- [ ] 4.3 Breadcrumbs contextuales en página de producto
-
-## Verificación
-- [ ] TypeScript compila sin errores
-- [ ] Build exitoso
-- [ ] Git push + deploy Vercel
+- [ ] 1. Crear componentes de marketing compartidos
+  - [ ] 1.1 Crear `src/components/marketing/Header.tsx` (con enlaces /faq, /precios, etc.)
+  - [ ] 1.2 Crear `src/components/marketing/Footer.tsx`
+  - [ ] 1.3 Crear `src/app/(marketing)/layout.tsx` (unifica Header y Footer para el grupo marketing)
+- [ ] 2. Crear las páginas individuales de sub-rutas
+  - [ ] 2.1 Crear `src/app/(marketing)/caracteristicas/page.tsx`
+  - [ ] 2.2 Crear `src/app/(marketing)/como-funciona/page.tsx`
+  - [ ] 2.3 Crear `src/app/(marketing)/precios/page.tsx`
+  - [ ] 2.4 Crear `src/app/(marketing)/faq/page.tsx`
+  - [ ] 2.5 Crear `src/app/(marketing)/nosotros/page.tsx`
+- [ ] 3. Mover y simplificar la página de inicio
+  - [ ] 3.1 Mover `src/app/page.tsx` a `src/app/(marketing)/page.tsx`
+  - [ ] 3.2 Remover las secciones redundantes de `page.tsx` (características, pasos, precios, faq)
+- [ ] 4. Verificación y pruebas
+  - [ ] 4.1 Validar compilación con `npx tsc --noEmit`
+  - [ ] 4.2 Validar build con `npm run build`
+  - [ ] 4.3 Git push e integración
