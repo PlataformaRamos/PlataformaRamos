@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import Logo from '@/components/marketing/Logo'
-import { Sparkles, Mail, Lock, Loader2, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Sparkles, Mail, Lock, Loader2, ArrowRight, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react'
 
 export default function LoginClient() {
   const searchParams = useSearchParams()
@@ -103,6 +104,15 @@ export default function LoginClient() {
       {/* Tarjeta de Autenticación Premium */}
       <div className="w-full max-w-md bg-slate-50 border border-slate-200/80 rounded-[32px] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.04)] relative z-10 transition-all duration-300">
         
+        {/* Botón Volver a Home */}
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400 hover:text-blue-600 transition-all mb-4 group select-none"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Volver al inicio</span>
+        </Link>
+
         {/* Cabecera / Identidad de Marca */}
         <div className="flex flex-col items-center text-center mb-8">
           <div className="flex items-center gap-2 group mb-4">
