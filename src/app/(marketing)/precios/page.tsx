@@ -1,3 +1,4 @@
+// Vista de precios en Soles Peruanos (PEN) para Plataforma Ramos
 import React from 'react'
 import Link from 'next/link'
 import { CheckCircle2 } from 'lucide-react'
