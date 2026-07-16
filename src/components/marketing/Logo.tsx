@@ -45,7 +45,7 @@ export default function Logo({ className = '', size = 40, mirror = false }: Logo
               animation: float-left 3.5s ease-in-out infinite;
             }
             .animate-right-diamond {
-              transform-origin: 72px 32px;
+              transform-origin: 70px 52px;
               animation: float-right 4.5s ease-in-out infinite;
             }
             .animate-trace {
@@ -91,14 +91,14 @@ export default function Logo({ className = '', size = 40, mirror = false }: Logo
 
         {/* Rombo Derecho Arriba (Azul) */}
         <polygon
-          points="72,21 78,32 72,43 66,32"
+          points="70,44 75,52 70,60 65,52"
           fill="url(#gradient-blue)"
           className="animate-right-diamond"
           filter="url(#glow-blue)"
         />
         {/* Trazo del Rombo Derecho */}
         <path
-          d="M 72 43 L 66 32 L 72 21"
+          d="M 70 60 L 65 52 L 70 44"
           stroke="#3B82F6"
           strokeWidth="1"
           strokeLinecap="round"
