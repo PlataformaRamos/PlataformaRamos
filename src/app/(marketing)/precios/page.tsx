@@ -33,7 +33,7 @@ export default function PreciosPage() {
                   <span className="text-4xl font-black text-slate-900">S/ 0</span>
                   <span className="text-slate-500 font-bold">/ mes</span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-2 font-medium">Ideal para emprendedores y nuevos negocios.</p>
+                <p className="text-[11px] text-slate-500 mt-2 font-medium">Ideal para emprendedores y nuevos negocios en el Perú.</p>
               </div>
 
               <div className="space-y-3.5 border-t border-slate-200 pt-6">
@@ -73,7 +73,7 @@ export default function PreciosPage() {
                   <span className="text-4xl font-black text-slate-900">S/ 39.90</span>
                   <span className="text-blue-600 font-bold">/ mes</span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-2 font-medium">Para comercios establecidos y marcas consolidadas.</p>
+                <p className="text-[11px] text-slate-500 mt-2 font-medium">Para comercios establecidos y marcas consolidadas en el Perú.</p>
               </div>
 
               <div className="space-y-3.5 border-t border-slate-200 pt-6">
