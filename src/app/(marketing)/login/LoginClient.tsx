@@ -248,13 +248,11 @@ export default function LoginClient() {
               <Button
                 type="button"
                 onClick={() => {
-                  setIsSignUp(false)
-                  setIsGoogleAccountExists(false)
-                  setError(null)
+                  window.location.href = '/dashboard'
                 }}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-[10px] h-9 transition-all active:scale-[0.98]"
               >
-                Ir a Iniciar Sesión
+                Ingresar a mi Tienda
               </Button>
             </div>
           )}
