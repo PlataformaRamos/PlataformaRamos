@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
@@ -56,8 +57,18 @@ export async function GET(request: Request) {
         
         // Si el usuario tiene cuenta desde hace más de 8 segundos, se considera existente
         if (diffSeconds > 8) {
-          // NO deslogueamos (no llamamos a signOut) para evitar desincronizar cookies.
-          // Redirigimos a login con el parámetro que indica que la cuenta ya existía.
+          // 1. Cerrar la sesión en el servidor
+          await supabase.auth.signOut()
+
+          // 2. Limpiar físicamente las cookies de Supabase para evitar desincronizaciones
+          const cookieStore = await cookies()
+          cookieStore.getAll().forEach((cookie) => {
+            if (cookie.name.startsWith('sb-')) {
+              cookieStore.delete(cookie.name)
+            }
+          })
+
+          // 3. Redirigir a login con el parámetro de error
           return NextResponse.redirect(
             `${origin}/login?error=account_exists_google&email=${encodeURIComponent(user.email || '')}`
           )
