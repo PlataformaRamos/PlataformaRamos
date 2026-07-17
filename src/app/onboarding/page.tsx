@@ -257,7 +257,7 @@ export default function OnboardingPage() {
                   
                   <div className="flex items-center justify-between gap-3 text-slate-800">
                     <span className="truncate font-mono text-blue-600 font-bold">
-                      {storeSlug}.plataformaramos.app
+                      {storeSlug}.rutaslima.app
                     </span>
 
                     {/* Estados de disponibilidad */}
@@ -275,6 +275,33 @@ export default function OnboardingPage() {
                       </div>
                     ) : null}
                   </div>
+                </div>
+              )}
+
+              {/* Barra de Navegador Simulada con candado SSL */}
+              {storeSlug && slugAvailable === true && (
+                <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-3.5 text-xs font-semibold animate-in fade-in slide-in-from-top-2 duration-300">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
+                    🌐 Barra de navegación del cliente
+                  </span>
+                  <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 shadow-inner">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-400/80 flex-shrink-0" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/80 flex-shrink-0" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-400/80 flex-shrink-0" />
+                    <div className="flex items-center gap-1 bg-slate-100/80 rounded-lg px-2.5 py-1 text-[10px] text-slate-500 flex-grow font-mono ml-2 truncate min-w-0">
+                      <svg className="w-3 h-3 text-emerald-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <rect x="5" y="11" width="14" height="10" rx="2" fill="none" />
+                        <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                      </svg>
+                      <span className="text-emerald-700 font-bold">https://</span>
+                      <span className="text-slate-800 font-bold">{storeSlug}.</span>
+                      <span className="text-slate-700 font-semibold">rutaslima.app</span>
+                      <span className="text-slate-400">/product/mi-producto</span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+                    ✨ <strong>Tu marca es la dueña de la URL.</strong> Cada producto que subas tendrá su propio enlace único listo para compartir en Instagram, TikTok o WhatsApp.
+                  </p>
                 </div>
               )}
             </div>

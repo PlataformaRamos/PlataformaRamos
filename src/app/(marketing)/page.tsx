@@ -204,7 +204,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                     <div className="w-8 h-8 rounded-lg bg-blue-600/10 flex items-center justify-center text-sm flex-shrink-0">🍕</div>
                     <div className="min-w-0">
                       <div className="font-bold text-slate-800 text-[9px] truncate">Tienda Ramos | Catálogo</div>
-                      <div className="text-[8px] text-slate-500 truncate">rutaslima.app/tienda-ramos</div>
+                      <div className="text-[8px] text-slate-500 truncate">tienda-ramos.rutaslima.app</div>
                     </div>
                   </div>
                 </div>
@@ -403,21 +403,39 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </div>
 
             {/* Tarjeta 3 */}
-            <div className="p-8 bg-white border border-slate-200/80 rounded-[32px] flex flex-col justify-between shadow-sm min-h-[260px] hover:shadow-md transition-shadow duration-300">
+            <div className="p-8 bg-white border border-slate-200/80 rounded-[32px] flex flex-col justify-between shadow-sm min-h-[260px] hover:shadow-md transition-shadow duration-300 group">
               <div className="space-y-4">
-                <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-purple-600" />
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Globe className="w-5 h-5 text-indigo-600" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900">
-                  +50k pedidos procesados
+                <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                  Tu Marca, Tu Enlace Propio
                 </h3>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                  Nuestra infraestructura en la nube está optimizada para recibir miles de visitas concurrentes sin ralentizar el catálogo de tus clientes.
+                  Cada producto que subas tiene su propia URL exclusiva en tu subdominio (ej: <code>tienda.rutaslima.app/product/pizza</code>). Cópialo y compártelo directo en tus historias de Instagram, TikTok o chats.
                 </p>
+                
+                {/* Mini Mockup de Enlace Compartido */}
+                <div className="bg-slate-50 border border-slate-200/40 rounded-2xl p-3.5 space-y-2.5 shadow-inner">
+                  <div className="flex gap-2.5 items-center">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-sm flex-shrink-0 select-none">🍕</div>
+                    <div className="min-w-0 flex-grow">
+                      <div className="font-extrabold text-slate-800 text-[9px] truncate">Pizza Pepperoni Familiar</div>
+                      <div className="text-[8px] text-indigo-600 font-mono font-bold truncate">tienda-ramos.rutaslima.app/product/pizza</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center bg-white border border-slate-100/50 rounded-xl px-2.5 py-1.5 text-[8.5px] font-extrabold text-slate-500">
+                    <span>S/ 39.90</span>
+                    <span className="text-emerald-600 flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                      Pedir por WhatsApp
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pt-4">
-                Infraestructura AWS y R2
+                URLs de Producto Compartibles
               </div>
             </div>
 
