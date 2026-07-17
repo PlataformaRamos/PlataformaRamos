@@ -47,23 +47,6 @@ export async function GET(request: Request) {
     if (exchangeSuccess && userData?.user) {
       const user = userData.user
       
-      // Control de flujo de Registro (Crear Cuenta) para Google OAuth
-      if (flow === 'signup') {
-        const createdAt = new Date(user.created_at).getTime()
-        // Comparar con last_sign_in_at para determinar si el usuario ya tenía cuenta previa
-        const lastSignIn = user.last_sign_in_at ? new Date(user.last_sign_in_at).getTime() : createdAt
-        const diffSeconds = Math.abs(lastSignIn - createdAt) / 1000
-        
-        // Si el usuario tiene cuenta desde hace más de 8 segundos, se considera existente
-        if (diffSeconds > 8) {
-          // Desloguear la sesión del servidor para bloquear el acceso directo al panel
-          await supabase.auth.signOut()
-          return NextResponse.redirect(
-            `${origin}/login?error=account_exists_google&email=${encodeURIComponent(user.email || '')}`
-          )
-        }
-      }
-      
       return NextResponse.redirect(`${origin}${next}`)
     } else {
       console.error('Error definitivo al intercambiar código por sesión tras 3 intentos:', lastError)
