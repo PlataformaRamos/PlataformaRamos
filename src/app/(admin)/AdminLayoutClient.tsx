@@ -32,6 +32,7 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
     { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
     { name: 'Pedidos', href: '/orders', icon: 'shopping_cart' },
     { name: 'Productos', href: '/products', icon: 'inventory_2' },
+    { name: 'Catálogos', href: '/catalogs', icon: 'menu_book' },
     { name: 'Clientes', href: '/customers', icon: 'group' },
     { name: 'Ajustes', href: '/settings', icon: 'settings' },
   ]

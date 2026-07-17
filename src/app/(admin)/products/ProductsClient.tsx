@@ -25,6 +25,16 @@ interface Product {
   position: number
 }
 
+interface Catalog {
+  id: string
+  name: string
+}
+
+interface CatalogRelation {
+  catalog_id: string
+  product_id: string
+}
+
 interface ProductsClientProps {
   store: {
     id: string
@@ -32,12 +42,15 @@ interface ProductsClientProps {
   }
   initialCategories: Category[]
   initialProducts: Product[]
+  catalogs: Catalog[]
+  initialRelations: CatalogRelation[]
 }
 
-export default function ProductsClient({ store, initialCategories, initialProducts }: ProductsClientProps) {
+export default function ProductsClient({ store, initialCategories, initialProducts, catalogs, initialRelations }: ProductsClientProps) {
   const [activeTab, setActiveTab] = useState<'products' | 'categories'>('products')
   const [categories, setCategories] = useState<Category[]>(initialCategories)
   const [products, setProducts] = useState<Product[]>(initialProducts)
+  const [relations, setRelations] = useState<CatalogRelation[]>(initialRelations)
 
   const [optimisticProducts, setOptimisticProducts] = useOptimistic(
     products,
@@ -60,6 +73,7 @@ export default function ProductsClient({ store, initialCategories, initialProduc
   const [prodCatId, setProdCatId] = useState('')
   const [prodImageUrl, setProdImageUrl] = useState('')
   const [prodAvailable, setProdAvailable] = useState(true)
+  const [prodCatalogIds, setProdCatalogIds] = useState<string[]>([])
   const [loadingProd, setLoadingProd] = useState(false)
   const [uploadingProdImg, setUploadingProdImg] = useState(false)
 
@@ -193,6 +207,12 @@ export default function ProductsClient({ store, initialCategories, initialProduc
       setProdCatId(product.category_id || '')
       setProdImageUrl(product.images[0] || '')
       setProdAvailable(product.is_available)
+      
+      // Obtener relaciones de catálogos del producto
+      const associatedCats = relations
+        .filter((r) => r.product_id === product.id)
+        .map((r) => r.catalog_id)
+      setProdCatalogIds(associatedCats)
     } else {
       setProdTitle('')
       setProdDesc('')
@@ -200,6 +220,7 @@ export default function ProductsClient({ store, initialCategories, initialProduc
       setProdCatId(categories[0]?.id || '')
       setProdImageUrl('')
       setProdAvailable(true)
+      setProdCatalogIds([])
     }
     setIsProductModalOpen(true)
   }
@@ -218,6 +239,8 @@ export default function ProductsClient({ store, initialCategories, initialProduc
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)+/g, '')
 
+    let savedProduct: Product | null = null
+
     if (selectedProduct) {
       const { data, error } = await supabase
         .from('products')
@@ -235,8 +258,8 @@ export default function ProductsClient({ store, initialCategories, initialProduc
         .single()
 
       if (!error && data) {
+        savedProduct = data
         setProducts((prev) => prev.map((p) => p.id === selectedProduct.id ? data : p))
-        setIsProductModalOpen(false)
       }
     } else {
       const maxPosition = products.reduce((max, prod) => prod.position > max ? prod.position : max, 0)
@@ -258,10 +281,45 @@ export default function ProductsClient({ store, initialCategories, initialProduc
         .single()
 
       if (!error && data) {
+        savedProduct = data
         setProducts((prev) => [...prev, data])
-        setIsProductModalOpen(false)
       }
     }
+
+    // Actualizar relaciones de catálogos en BD
+    if (savedProduct) {
+      const productId = savedProduct.id
+      
+      // 1. Limpiar relaciones anteriores
+      await supabase
+        .from('catalog_products')
+        .delete()
+        .eq('product_id', productId)
+
+      // 2. Insertar las nuevas
+      if (prodCatalogIds.length > 0) {
+        const insertData = prodCatalogIds.map((cid) => ({
+          catalog_id: cid,
+          product_id: productId,
+        }))
+        await supabase
+          .from('catalog_products')
+          .insert(insertData)
+      }
+
+      // 3. Actualizar relaciones locales
+      setRelations((prev) => {
+        const filtered = prev.filter((r) => r.product_id !== productId)
+        const added = prodCatalogIds.map((cid) => ({
+          catalog_id: cid,
+          product_id: productId,
+        }))
+        return [...filtered, ...added]
+      })
+
+      setIsProductModalOpen(false)
+    }
+
     setLoadingProd(false)
   }
 
@@ -738,6 +796,40 @@ export default function ProductsClient({ store, initialCategories, initialProduc
                   />
                 </div>
               </div>
+
+              {/* Asignación a Catálogos */}
+              {catalogs.length > 0 && (
+                <div className="space-y-1.5 pt-1">
+                  <label className="block text-[10px] text-on-surface-variant uppercase tracking-wider">
+                    Aparece en los siguientes Catálogos:
+                  </label>
+                  <div className="bg-slate-50 border border-slate-200/60 rounded-lg p-2.5 space-y-2 max-h-[110px] overflow-y-auto">
+                    {catalogs.map((cat) => {
+                      const isChecked = prodCatalogIds.includes(cat.id)
+                      return (
+                        <div key={cat.id} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id={`prod_cat_${cat.id}`}
+                            checked={isChecked}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setProdCatalogIds((prev) => [...prev, cat.id])
+                              } else {
+                                setProdCatalogIds((prev) => prev.filter((id) => id !== cat.id))
+                              }
+                            }}
+                            className="rounded border-slate-300 text-slate-900 focus:ring-admin-deep-blue cursor-pointer"
+                          />
+                          <label htmlFor={`prod_cat_${cat.id}`} className="text-[11px] text-slate-700 font-bold cursor-pointer select-none">
+                            {cat.name}
+                          </label>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center gap-2 pt-2">
                 <input

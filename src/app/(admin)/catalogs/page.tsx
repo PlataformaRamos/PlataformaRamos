@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import ProductsClient from './ProductsClient'
+import CatalogsClient from './CatalogsClient'
 
-export default async function ProductsPage() {
+export default async function CatalogsPage() {
   const supabase = await createClient()
 
   // 1. Obtener sesión
@@ -40,43 +40,36 @@ export default async function ProductsPage() {
     redirect('/dashboard')
   }
 
-  // 3. Obtener Categorías (ordenadas por posición)
-  const { data: categories } = await supabase
-    .from('categories')
-    .select('*')
-    .eq('store_id', store.id)
-    .order('position', { ascending: true })
-
-  // 4. Obtener Productos (ordenados por posición)
-  const { data: products } = await supabase
-    .from('products')
-    .select('*')
-    .eq('store_id', store.id)
-    .order('position', { ascending: true })
-
-  // 5. Obtener Catálogos de la tienda
+  // 3. Obtener Catálogos
   const { data: catalogs } = await supabase
     .from('catalogs')
-    .select('id, name')
+    .select('*')
     .eq('store_id', store.id)
+    .order('created_at', { ascending: false })
 
-  // 6. Obtener relaciones catalog_products de los productos de la tienda
-  const productIds = (products || []).map((p) => p.id)
+  // 4. Obtener todos los Productos de la tienda para asignación
+  const { data: products } = await supabase
+    .from('products')
+    .select('id, name, price, status')
+    .eq('store_id', store.id)
+    .order('position', { ascending: true })
+
+  // 5. Obtener las relaciones catalog_products para los catálogos de esta tienda
+  const catalogIds = (catalogs || []).map(c => c.id)
   let catalogRelations: any[] = []
-  if (productIds.length > 0) {
+  if (catalogIds.length > 0) {
     const { data: relations } = await supabase
       .from('catalog_products')
       .select('*')
-      .in('product_id', productIds)
+      .in('catalog_id', catalogIds)
     catalogRelations = relations || []
   }
 
   return (
-    <ProductsClient 
+    <CatalogsClient 
       store={store} 
-      initialCategories={categories || []}
-      initialProducts={products || []}
-      catalogs={catalogs || []}
+      initialCatalogs={catalogs || []}
+      products={products || []}
       initialRelations={catalogRelations}
     />
   )
