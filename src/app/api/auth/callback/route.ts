@@ -68,9 +68,9 @@ export async function GET(request: Request) {
             }
           })
 
-          // 3. Redirigir a login con el parámetro de error
+          // 3. Redirigir a login en modo registro (signup) con el parámetro de error
           return NextResponse.redirect(
-            `${origin}/login?error=account_exists_google&email=${encodeURIComponent(user.email || '')}`
+            `${origin}/login?mode=signup&error=account_exists_google&email=${encodeURIComponent(user.email || '')}`
           )
         }
       }
