@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import StorefrontClient from './StorefrontClient'
 import StorefrontCatalogsClient from './StorefrontCatalogsClient'
+import StoreSuspendedScreen from './StoreSuspendedScreen'
 
 interface TenantPageProps {
   params: Promise<{ domain: string }>
@@ -11,16 +12,21 @@ export default async function TenantPage({ params }: TenantPageProps) {
   const { domain } = await params
   const supabase = await createClient()
 
-  // 1. Obtener la tienda activa
+  // 1. Buscar la tienda sin filtrar por is_active para distinguir suspensión vs. 404
   const { data: store } = await supabase
     .from('stores')
     .select('*')
     .or(`slug.eq.${domain},custom_domain.eq.${domain}`)
-    .eq('is_active', true)
     .single()
 
+  // Si no existe la tienda en absoluto → 404
   if (!store) {
     notFound()
+  }
+
+  // Si la tienda existe pero está suspendida → pantalla premium de suspensión
+  if (!store.is_active) {
+    return <StoreSuspendedScreen storeName={store.name} />
   }
 
   // 2. Obtener Catálogos activos de la tienda

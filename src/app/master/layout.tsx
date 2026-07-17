@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import React from 'react'
+import MasterLayoutClient from './MasterLayoutClient'
 
 export default async function MasterLayout({
   children,
@@ -12,23 +13,23 @@ export default async function MasterLayout({
   // 1. Validar autenticación
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    redirect('/login')
+    redirect('/master/login')
   }
 
   // 2. Validar rol de Super Admin
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('*')
     .eq('id', user.id)
     .single()
 
   if (!profile || profile.role !== 'super_admin') {
-    redirect('/dashboard')
+    redirect('/master/login')
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-900 text-slate-100 min-h-screen">
+    <MasterLayoutClient profile={profile}>
       {children}
-    </div>
+    </MasterLayoutClient>
   )
 }

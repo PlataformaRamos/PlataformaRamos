@@ -38,7 +38,7 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
   ]
 
   if (profile.role === 'super_admin') {
-    navigation.push({ name: 'Panel Master', href: '/master', icon: 'shield' })
+    navigation.push({ name: 'Panel Master', href: '/master/dashboard', icon: 'shield' })
   }
 
   const handleLogout = async () => {
