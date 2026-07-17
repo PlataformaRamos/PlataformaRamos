@@ -26,7 +26,13 @@ export default function MasterLoginPage() {
         password,
       })
 
-      if (signInError) throw new Error(signInError.message)
+      if (signInError) {
+        // Diferenciar entre usuario no existe y contraseña incorrecta
+        if (signInError.message.includes('Invalid login credentials')) {
+          throw new Error('Credenciales inválidas. Verifica tu correo y contraseña.')
+        }
+        throw new Error(signInError.message)
+      }
       if (!authData.user) throw new Error('No se pudo autenticar el usuario.')
 
       // 2. Verificar rol de Super Admin en el perfil
@@ -38,12 +44,12 @@ export default function MasterLoginPage() {
 
       if (profileError || !profile) {
         await supabase.auth.signOut()
-        throw new Error('No se encontró el perfil de usuario.')
+        throw new Error('Perfil de usuario no encontrado. Contacta al administrador del sistema.')
       }
 
       if (profile.role !== 'super_admin') {
         await supabase.auth.signOut()
-        throw new Error('Acceso denegado. Esta sección es exclusiva para Super Administradores.')
+        throw new Error('Acceso denegado. Esta sección es exclusiva para Super Administradores. Tu rol actual: ' + profile.role)
       }
 
       // Redirigir a Master Dashboard
