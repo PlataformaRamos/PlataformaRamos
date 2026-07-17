@@ -48,7 +48,7 @@ export default async function AdminLayout({
   }
 
   // 4. Redirección centralizada al Onboarding si la tienda no está configurada
-  if (!store || !store.slug || !store.phone || !store.category) {
+  if (!store || !store.slug || !store.whatsapp_phone || !store.category) {
     redirect('/onboarding')
   }
 

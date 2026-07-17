@@ -66,11 +66,11 @@ export default function OnboardingPage() {
         // Verificar si ya tiene una tienda configurada de forma segura
         const { data: existingStore } = await supabase
           .from('stores')
-          .select('id, slug, phone, category')
+          .select('id, slug, whatsapp_phone, category')
           .eq('owner_id', user.id)
           .single()
 
-        if (existingStore && existingStore.slug && existingStore.phone && existingStore.category) {
+        if (existingStore && existingStore.slug && existingStore.whatsapp_phone && existingStore.category) {
           router.push('/dashboard')
         }
       }
@@ -145,7 +145,7 @@ export default function OnboardingPage() {
         .insert({
           name: storeName.trim(),
           slug: storeSlug,
-          phone: finalPhone,
+          whatsapp_phone: finalPhone,
           category: selectedCategory,
           owner_id: userId,
         })
