@@ -94,51 +94,42 @@ export default function StoresClient({ initialStores }: StoresClientProps) {
     setReasonError('')
 
     try {
+      // Consumir el endpoint administrativo master
+      const res = await fetch('/api/master/stores', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          storeId: reasonModal.storeId,
+          action: reasonModal.action,
+          reason: reason.trim(),
+          planId: reasonModal.action === 'change_plan'
+            ? (reasonModal.currentPlan === 'free' ? 'premium' : 'free')
+            : undefined
+        })
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Error al ejecutar la acción administrativa')
+      }
+
+      // Actualizar estado en el frontend
       if (reasonModal.action === 'suspend' || reasonModal.action === 'activate') {
         const newStatus = reasonModal.action === 'activate'
-        const { error } = await supabase
-          .from('stores')
-          .update({ is_active: newStatus })
-          .eq('id', reasonModal.storeId)
-
-        if (error) throw error
-
         setStores(prev => prev.map(s => s.id === reasonModal.storeId ? { ...s, is_active: newStatus } : s))
-
-        // Registrar en bitácora
-        await supabase.from('platform_audit_logs').insert({
-          action: newStatus ? 'activate_store' : 'suspend_store',
-          target_id: reasonModal.storeId,
-          target_name: reasonModal.storeName,
-          reason: reason.trim(),
-        })
-
       } else if (reasonModal.action === 'change_plan') {
         const newPlan = reasonModal.currentPlan === 'free' ? 'premium' : 'free'
         const newExpiration = newPlan === 'premium'
           ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
           : null
-
-        const { error } = await supabase
-          .from('stores')
-          .update({ plan_id: newPlan, plan_expires_at: newExpiration })
-          .eq('id', reasonModal.storeId)
-
-        if (error) throw error
-
         setStores(prev => prev.map(s => s.id === reasonModal.storeId ? {
           ...s,
           plan_id: newPlan,
           plan_expires_at: newExpiration,
         } : s))
-
-        // Registrar en bitácora
-        await supabase.from('platform_audit_logs').insert({
-          action: 'change_plan',
-          target_id: reasonModal.storeId,
-          target_name: reasonModal.storeName,
-          reason: reason.trim(),
-        })
       }
 
       setReasonModal(null)
