@@ -9,6 +9,13 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl
   const host = request.headers.get('host') || ''
 
+  // Si el host comienza con www., redirigir físicamente a la versión sin www
+  if (host.toLowerCase().startsWith('www.')) {
+    const newHost = host.substring(4) // Remueve 'www.'
+    const protocol = request.headers.get('x-forwarded-proto') || 'https'
+    return NextResponse.redirect(`${protocol}://${newHost}${url.pathname}${url.search}`, 308)
+  }
+
   // Normalizar el host (remover puerto y prefijo www. para evitar bucles)
   const rawHostname = host.split(':')[0]
   const hostname = rawHostname.replace(/^www\./, '')

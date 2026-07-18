@@ -55,7 +55,20 @@ export default function LoginClient() {
         setGoogleEmail(emailVal)
         setIsGoogleAccountExists(true)
       } else if (errText === 'auth-callback-failed') {
-        setError('Tuvimos un inconveniente al conectar con tu cuenta de Google por un problema temporal de red. Por favor, intenta de nuevo presionando "Acceder con Google".')
+        const technicalDetails = descParam ? decodeURIComponent(descParam) : '';
+        let baseMsg = 'Tuvimos un inconveniente al conectar con tu cuenta de Google. ';
+        
+        if (technicalDetails) {
+          baseMsg += `Detalle técnico: "${technicalDetails}". `;
+          if (technicalDetails.toLowerCase().includes('pkce') || technicalDetails.toLowerCase().includes('code verifier')) {
+            baseMsg += 'Este error suele ocurrir por inconsistencias entre dominios en tu navegador (por ejemplo, iniciar sesión desde www.rutaslima.app y ser devuelto a rutaslima.app). Asegúrate de navegar en la versión correcta sin el prefijo "www".';
+          } else {
+            baseMsg += 'Por favor, intenta de nuevo presionando "Acceder con Google".';
+          }
+        } else {
+          baseMsg += 'Por favor, intenta de nuevo presionando "Acceder con Google".';
+        }
+        setError(baseMsg)
       } else {
         setError(descParam ? decodeURIComponent(descParam) : 'No pudimos autenticar tu cuenta. Inténtalo de nuevo.')
       }
