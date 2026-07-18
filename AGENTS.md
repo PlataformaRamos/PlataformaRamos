@@ -69,3 +69,7 @@ Habilitado para interactuar con sistemas de diseño, variantes y edición rápid
     *   Consolida tus iteraciones de forma local en tu servidor de desarrollo (`npm run dev`) y solicita aprobación o indicación de despliegue antes de empujar cambios al repositorio remoto.
 5.  **Evitar Degradados con ID Dinámicos en SVG**:
     *   Debido al uso de `next-view-transitions`, los degradados lineales con referencias locales de ID (como `fill="url(#mi-gradiente)"`) se vuelven transparentes al navegar. Usa siempre **colores planos sólidos** (por ejemplo, `#EF4444`, `#3B82F6`) en los atributos `fill` y `stroke` de los polígonos de marcas y logotipos.
+6.  **Protección del Super Administrador (`admin@dev.app`)**:
+    *   **Prohibido eliminar el Super Admin**: Al realizar pruebas, limpiezas de base de datos o truncamientos (`TRUNCATE` / `DELETE`), nunca se debe eliminar el usuario administrador con correo `admin@dev.app` ni su perfil con rol `super_admin`.
+    *   La base de datos tiene activo un trigger de seguridad en `public.profiles` (`prevent_super_admin_profile_deletion`) que abortará automáticamente cualquier transacción que intente eliminarlo directa o indirectamente (en cascada).
+    *   Para hacer limpiezas sin fallar, excluye explícitamente al super admin (ej: `DELETE FROM auth.users WHERE email != 'admin@dev.app'`).
