@@ -368,7 +368,10 @@ export default function ProductsClient({ store, initialCategories, initialProduc
 
   const formatCurrency = (amount: number) => {
     const currency = store.currency_code || 'PEN'
-    return new Intl.NumberFormat(currency === 'PEN' ? 'es-PE' : 'es-US', {
+    if (currency === 'PEN') {
+      return `S/ ${amount.toFixed(2)}`
+    }
+    return new Intl.NumberFormat('es-US', {
       style: 'currency',
       currency: currency,
     }).format(amount)

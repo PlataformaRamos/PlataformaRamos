@@ -266,9 +266,13 @@ export default function CatalogViewClient({ store, catalog, categories, products
   }
 
   const formatPrice = (amount: number) => {
+    const currency = store.currency_code || 'PEN'
+    if (currency === 'PEN') {
+      return `S/ ${amount.toFixed(2)}`
+    }
     return new Intl.NumberFormat('es-US', {
       style: 'currency',
-      currency: store.currency_code || 'USD',
+      currency: currency,
     }).format(amount)
   }
 

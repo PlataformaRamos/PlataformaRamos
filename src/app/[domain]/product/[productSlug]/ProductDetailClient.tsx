@@ -89,9 +89,14 @@ export default function ProductDetailClient({ store, product, categories }: Prod
 
   // Formateador de precios de la tienda
   const formatPrice = (amount: number) => {
+    const currency = store.currency_code || 'PEN'
+    if (currency === 'PEN') {
+      const decimals = store.show_decimals ? 2 : 0
+      return `S/ ${amount.toFixed(decimals)}`
+    }
     const formatted = new Intl.NumberFormat('es-US', {
       style: 'currency',
-      currency: store.currency_code || 'USD',
+      currency: currency,
       minimumFractionDigits: store.show_decimals ? 2 : 0,
       maximumFractionDigits: store.show_decimals ? 2 : 0,
     }).format(amount)
