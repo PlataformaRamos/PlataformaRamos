@@ -30,6 +30,7 @@ interface StoreType {
   plan_expires_at: string | null
   is_active: boolean
   owner_name: string | null
+  owner_email?: string
   created_at: string
 }
 
@@ -257,6 +258,9 @@ export default function StoresClient({ initialStores }: StoresClientProps) {
                       <div className="font-extrabold text-white">{store.name}</div>
                       {store.owner_name && (
                         <div className="text-[10px] text-slate-500 font-medium mt-0.5">{store.owner_name}</div>
+                      )}
+                      {store.owner_email && (
+                        <div className="text-[9px] text-indigo-400 font-mono mt-0.5">{store.owner_email}</div>
                       )}
                     </td>
                     <td className="py-3.5 px-5">
