@@ -6,17 +6,49 @@ export default async function CustomersPage() {
   const { store } = await getAdminStoreOrRedirect()
   const supabase = await createClient()
 
-  // Obtener listado inicial de clientes de la tienda
-  const { data: customers } = await supabase
+  // 1. Obtener listado inicial de clientes de la tienda
+  const { data: rawCustomers } = await supabase
     .from('customers')
     .select('*')
     .eq('store_id', store.id)
     .order('created_at', { ascending: false })
 
+  // 2. Obtener listado de pedidos de la tienda para calcular métricas dinámicas de clientes
+  const { data: rawOrders } = await supabase
+    .from('orders')
+    .select('id, customer_id, total, status, created_at')
+    .eq('store_id', store.id)
+
+  const orders = rawOrders || []
+  
+  // 3. Enriquecer los clientes con contadores de órdenes y total gastado (evita crashes por columnas inexistentes)
+  const customers = (rawCustomers || []).map((cust) => {
+    const custOrders = orders.filter(o => o.customer_id === cust.id)
+    const completedOrders = custOrders.filter(o => o.status === 'completed')
+    const totalSpent = completedOrders.reduce((sum, o) => sum + Number(o.total || 0), 0)
+    
+    let lastOrderDate: string | null = null
+    if (custOrders.length > 0) {
+      const sorted = [...custOrders].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      lastOrderDate = sorted[0].created_at
+    }
+
+    return {
+      id: cust.id,
+      name: cust.name,
+      phone: cust.phone,
+      email: cust.email,
+      created_at: cust.created_at,
+      orders_count: custOrders.length,
+      total_spent: totalSpent,
+      last_order_date: lastOrderDate
+    }
+  })
+
   return (
     <CustomersClient 
       store={store} 
-      initialCustomers={customers || []} 
+      initialCustomers={customers} 
     />
   )
 }
