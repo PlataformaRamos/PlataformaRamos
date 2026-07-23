@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 
@@ -39,6 +40,7 @@ interface SettingsClientProps {
 export default function SettingsClient({ store, members, isCollaborator, collaboratorRole }: SettingsClientProps) {
   const [activeSubTab, setActiveSubTab] = useState<'general' | 'sales' | 'receipt' | 'payments' | 'delivery' | 'team'>('general')
   const supabase = createClient()
+  const router = useRouter()
 
   // 1. Estados General
   const [storeName, setStoreName] = useState(store.name)
@@ -174,6 +176,8 @@ export default function SettingsClient({ store, members, isCollaborator, collabo
       setSuccessMsg('Ajustes guardados con éxito.')
       setStoreSlug(finalSlug)
       setStorePhone(cleanPhone)
+      // Actualización transparente SPA de la interfaz y del sidebar sin recargar la ventana
+      router.refresh()
     }
     setSaving(false)
   }
