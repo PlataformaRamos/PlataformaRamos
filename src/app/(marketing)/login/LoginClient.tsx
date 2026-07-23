@@ -6,13 +6,13 @@ import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import Logo from '@/components/marketing/Logo'
-import { Sparkles, Mail, Lock, Loader2, ArrowRight, CheckCircle2, AlertCircle, ArrowLeft, ShieldCheck } from 'lucide-react'
+import { Mail, Lock, Loader2, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react'
 import AuthTransitionOverlay from '@/components/auth/AuthTransitionOverlay'
 import { motion } from 'framer-motion'
 import { useScrollLock } from '@/hooks/useScrollLock'
 
 export default function LoginClient() {
-  // Bloquear el scroll de la página de fondo al 100% en la pantalla de login (Estilo App Android)
+  // Bloquear el scroll de la página de fondo al 100% en la pantalla de login (Sin scroll)
   useScrollLock(true)
 
   const searchParams = useSearchParams()
@@ -148,7 +148,7 @@ export default function LoginClient() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 w-full h-[100dvh] bg-slate-950 text-white flex flex-col justify-between p-4 sm:p-6 overflow-hidden select-none font-sans">
+    <div className="fixed inset-0 z-50 w-full h-[100dvh] bg-slate-950 text-white flex items-center justify-center p-4 sm:p-6 overflow-hidden select-none font-sans">
       <AuthTransitionOverlay
         isVisible={authTransition}
         userEmailOrName={email}
@@ -158,36 +158,21 @@ export default function LoginClient() {
         }}
       />
 
-      {/* Luces y Glows Ambientales Neón estilo App */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-gradient-to-tr from-blue-600/15 via-indigo-600/15 to-emerald-500/10 rounded-full blur-[130px] pointer-events-none" />
+      {/* Luces y Glows Ambientales Neón */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-gradient-to-tr from-blue-600/15 via-indigo-600/15 to-emerald-500/10 rounded-full blur-[130px] pointer-events-none" />
 
-      {/* 1. Header Estilo App Móvil Android / iOS */}
-      <div className="relative z-10 flex items-center justify-between border-b border-slate-800/80 pb-3">
-        <Link 
-          href="/" 
-          className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-300 hover:text-white transition-colors group bg-slate-900/80 border border-slate-800 rounded-full px-3 py-1.5 backdrop-blur-md"
-        >
-          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform text-blue-400" />
-          <span>Inicio</span>
-        </Link>
-
-        <div className="flex items-center gap-2">
-          <Logo size={24} />
-          <span className="font-black text-xs tracking-tight flex items-center gap-1">
+      {/* Tarjeta Central Principal Única */}
+      <div className="relative z-10 max-w-sm sm:max-w-md w-full bg-slate-900/90 border border-slate-800/90 shadow-[0_0_60px_rgba(0,0,0,0.6)] rounded-3xl p-5 sm:p-7 backdrop-blur-2xl transition-all duration-300 flex flex-col gap-4">
+        
+        {/* Marca en la Tarjeta */}
+        <div className="flex items-center justify-center gap-2 mb-0.5">
+          <Logo size={26} />
+          <span className="font-black text-sm tracking-tight flex items-center gap-1">
             <span className="text-[#EF4444]">Plataforma</span>
             <span className="text-[#3B82F6]">Ramos</span>
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-3 py-1 text-[10px] font-bold text-emerald-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>SSL Activo</span>
-        </div>
-      </div>
-
-      {/* 2. Tarjeta Central Principal Adaptada a Pantalla Completa */}
-      <div className="relative z-10 max-w-sm sm:max-w-md w-full mx-auto my-auto bg-slate-900/90 border border-slate-800/90 shadow-[0_0_60px_rgba(0,0,0,0.6)] rounded-3xl p-5 sm:p-7 backdrop-blur-2xl transition-all duration-300 flex flex-col gap-4">
-        
         {/* Selector de Pestañas Animado (Pill Switcher) */}
         <div className="bg-slate-950 p-1 rounded-2xl flex items-center relative border border-slate-800">
           <button
@@ -398,12 +383,16 @@ export default function LoginClient() {
           </svg>
           <span>Acceder con Google</span>
         </Button>
-      </div>
 
-      {/* 3. Footer Estilo App Móvil */}
-      <div className="relative z-10 flex items-center justify-between border-t border-slate-800/80 pt-3 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-        <span>Plataforma Ramos © 2026</span>
-        <span>App Móvil & Web</span>
+        {/* Link de retorno al inicio */}
+        <div className="text-center pt-1">
+          <Link
+            href="/"
+            className="text-[11px] text-slate-500 hover:text-slate-300 font-bold transition-colors"
+          >
+            ← Volver a la página principal
+          </Link>
+        </div>
       </div>
     </div>
   )
