@@ -39,18 +39,18 @@ export default function Header() {
     <header className="w-full bg-white/95 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between relative z-50">
         
-        {/* Logo responsivo */}
-        <Link href="/" className="flex items-center gap-2 sm:gap-3 group z-50" onClick={() => setMobileMenuOpen(false)}>
-          <Logo size={32} className="sm:hidden block group-hover:scale-105 transition-transform" />
+        {/* Logo responsivo con ambos SVGs (normal y espejo) tanto en móvil como en desktop */}
+        <Link href="/" className="flex items-center gap-1.5 sm:gap-3 group z-50" onClick={() => setMobileMenuOpen(false)}>
+          <Logo size={26} className="sm:hidden block group-hover:scale-105 transition-transform" />
           <Logo size={42} className="hidden sm:block group-hover:scale-105 transition-transform" />
           
-          <span className="font-black text-base sm:text-xl md:text-2xl tracking-tight flex items-center gap-1 sm:gap-1.5 select-none">
+          <span className="font-black text-sm sm:text-xl md:text-2xl tracking-tight flex items-center gap-1 sm:gap-1.5 select-none">
             <span className="text-[#EF4444]">Plataforma</span>
             <span className="text-[#3B82F6]">Ramos</span>
           </span>
           
-          {/* Ocultar el logo en espejo del lado derecho en celulares pequeños para dar espacio */}
-          <Logo size={42} mirror className="hidden md:block group-hover:scale-105 transition-transform" />
+          <Logo size={26} mirror className="sm:hidden block group-hover:scale-105 transition-transform" />
+          <Logo size={42} mirror className="hidden sm:block group-hover:scale-105 transition-transform" />
         </Link>
 
         {/* Navigation para pantallas grandes */}
