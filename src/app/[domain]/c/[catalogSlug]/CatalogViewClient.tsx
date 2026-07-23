@@ -381,7 +381,7 @@ export default function CatalogViewClient({ store, catalog, categories, products
 
   // Colores personalizados del tenant
   const tenantStyles = {
-    '--tenant-primary': store.theme_settings?.primary_color || '#3B82F6',
+    '--tenant-primary': store.theme_settings?.primaryColor || store.theme_settings?.primary_color || '#3B82F6',
   } as React.CSSProperties
 
   return (

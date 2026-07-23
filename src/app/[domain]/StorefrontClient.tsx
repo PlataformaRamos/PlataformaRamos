@@ -391,8 +391,12 @@ export default function StorefrontClient({ store, categories, products, shipping
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-screen">
-      
+    <div className="flex-1 flex flex-col min-h-screen" style={{ '--tenant-primary': store.theme_settings?.primaryColor || '#3B82F6' } as React.CSSProperties}>
+      {/* BARRA PROMOCIONAL SUPERIOR (TOP ANNOUNCEMENT BAR) */}
+      <div className="bg-[var(--tenant-primary)] text-white text-[11px] font-bold py-1.5 px-4 text-center flex items-center justify-center gap-2 overflow-hidden shadow-xs">
+        <span>{store.theme_settings?.promoText || '🎉 ¡Bienvenido a nuestra tienda! Haz tus pedidos en línea y recíbelos por WhatsApp.'}</span>
+      </div>
+
       {/* 1. DISEÑO MÓVIL PREMIUM */}
       <div className="md:hidden flex-1 flex flex-col w-full bg-white min-h-screen relative pb-24">
         
@@ -461,6 +465,55 @@ export default function StorefrontClient({ store, categories, products, shipping
             </div>
           )}
         </header>
+
+        {/* BANNER HERO PROMO MÓVIL */}
+        <div className="p-3 pb-1">
+          <div className="relative rounded-2xl overflow-hidden bg-slate-900 text-white p-4 shadow-md border border-slate-800 flex flex-col justify-between min-h-[140px]">
+            {store.theme_settings?.bannerUrl ? (
+              <>
+                <img
+                  src={store.theme_settings.bannerUrl}
+                  alt={store.name}
+                  className="absolute inset-0 w-full h-full object-cover z-0"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/75 to-slate-950/40 z-0" />
+              </>
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 z-0" />
+            )}
+
+            <div className="relative z-10 flex items-center justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 overflow-hidden flex items-center justify-center font-black text-xs">
+                  {store.logo_url ? (
+                    <img src={getOptimizedImageUrl(store.logo_url, { width: 60, height: 60 })} alt={store.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{store.name.charAt(0).toUpperCase()}</span>
+                  )}
+                </div>
+                <span className="text-[11px] font-extrabold tracking-wide uppercase text-slate-300 truncate max-w-[150px]">{store.name}</span>
+              </div>
+              <div className="flex items-center gap-1 bg-emerald-500/20 border border-emerald-500/30 rounded-full px-2 py-0.5 text-[9px] font-bold text-emerald-300 backdrop-blur-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Abierto</span>
+              </div>
+            </div>
+
+            <div className="relative z-10 space-y-1">
+              <h2 className="text-sm font-black tracking-tight leading-tight text-white line-clamp-1">
+                {store.theme_settings?.bannerTitle || store.name}
+              </h2>
+              <p className="text-[10px] text-slate-300 font-medium leading-snug line-clamp-2">
+                {store.theme_settings?.bannerSubtitle || store.description || 'Explora nuestras mejores ofertas con envío rápido y atención directa.'}
+              </p>
+            </div>
+
+            <div className="relative z-10 flex items-center gap-1.5 pt-2 text-[9px] font-bold text-slate-300 border-t border-white/10 mt-2">
+              <span className="bg-white/10 px-2 py-0.5 rounded-full backdrop-blur-xs">⚡ Envíos Rápidos</span>
+              <span className="bg-white/10 px-2 py-0.5 rounded-full backdrop-blur-xs">📱 Pedidos por WhatsApp</span>
+            </div>
+          </div>
+        </div>
 
         {/* CATEGORÍAS — Pills horizontales con gradient fade */}
         <div className="sticky top-14 bg-white/95 backdrop-blur-md z-20 border-b border-slate-100/60">
@@ -598,24 +651,19 @@ export default function StorefrontClient({ store, categories, products, shipping
 
           {/* Carrito de Compra */}
           <div className="flex items-center gap-4">
-            <button 
-              id="btn-open-cart-desktop"
-              data-testid="open-cart-desktop"
+            <button
+              id="btn-carrito-header-desktop"
+              data-testid="carrito-header-desktop"
               onClick={() => {
                 if (cart.items.length > 0) {
                   setIsCartOpen(true)
                   setIsCheckoutStep(false)
                 }
               }}
-              className="relative bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-md active:scale-95"
+              className="relative px-4 py-2 bg-[var(--tenant-primary)] text-white font-extrabold text-xs rounded-full shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
             >
               <ShoppingBag className="w-4 h-4" />
               <span>Carrito ({cart.items.reduce((acc, i) => acc + i.quantity, 0)})</span>
-              {cart.items.length > 0 && (
-                <span className="bg-[var(--tenant-primary)] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-black animate-bounce">
-                  {cart.items.length}
-                </span>
-              )}
             </button>
           </div>
         </header>

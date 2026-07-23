@@ -51,6 +51,11 @@ export default function SettingsClient({ store, members, isCollaborator, collabo
   const [showDecimals, setShowDecimals] = useState(store.show_decimals)
   const [showCanceledOrders, setShowCanceledOrders] = useState(store.show_canceled_orders)
   const [primaryColor, setPrimaryColor] = useState(store.theme_settings?.primaryColor || '#3B82F6')
+  const [bannerUrl, setBannerUrl] = useState(store.theme_settings?.bannerUrl || '')
+  const [bannerTitle, setBannerTitle] = useState(store.theme_settings?.bannerTitle || '')
+  const [bannerSubtitle, setBannerSubtitle] = useState(store.theme_settings?.bannerSubtitle || '')
+  const [promoText, setPromoText] = useState(store.theme_settings?.promoText || '')
+  const [uploadingBanner, setUploadingBanner] = useState(false)
   const [currencyCode, setCurrencyCode] = useState(store.currency_code || 'PEN')
 
   // 2. Estados Pedidos y Ventas
@@ -120,6 +125,40 @@ export default function SettingsClient({ store, members, isCollaborator, collabo
     }
   }
 
+  // Subir Banner Promocional a Cloudflare R2
+  const handleUploadBanner = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingBanner(true)
+    setErrorMsg(null)
+    setSuccessMsg(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('path', `stores/${store.id}/banner`)
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Error al subir la imagen del banner')
+      }
+
+      setBannerUrl(data.url)
+      setSuccessMsg('Banner cargado correctamente (recuerda guardar los ajustes para confirmar).')
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error al subir el banner.')
+    } finally {
+      setUploadingBanner(false)
+    }
+  }
+
   // Guardar Cambios Generales, Ventas, Recibo, Pagos y Envíos
   const handleSaveSettings = async () => {
     setSaving(true)
@@ -147,7 +186,13 @@ export default function SettingsClient({ store, members, isCollaborator, collabo
         logo_url: logoUrl || null,
         show_decimals: showDecimals,
         show_canceled_orders: showCanceledOrders,
-        theme_settings: { primaryColor },
+        theme_settings: {
+          primaryColor,
+          bannerUrl,
+          bannerTitle: bannerTitle.trim(),
+          bannerSubtitle: bannerSubtitle.trim(),
+          promoText: promoText.trim(),
+        },
         currency_code: currencyCode,
         collect_sales_tax: collectSalesTax,
         sales_tax_rate: parseFloat(salesTaxRate) || 0,
@@ -417,6 +462,107 @@ export default function SettingsClient({ store, members, isCollaborator, collabo
                     <option value="PEN">Soles Peruanos (S/.)</option>
                     <option value="USD">Dólares Americanos ($)</option>
                   </select>
+                </div>
+              </div>
+
+              {/* Sección Personalizada: Banner Hero y Promociones */}
+              <div className="pt-6 border-t border-slate-200/80 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                      <span className="material-symbols-outlined text-blue-600 text-[20px]">view_carousel</span>
+                      <span>Personalización de Banner Hero y Promociones</span>
+                    </h4>
+                    <p className="text-xs text-slate-500 font-medium">Diseña la portada promocional y anuncios superiores de tu tienda pública.</p>
+                  </div>
+                </div>
+
+                {/* Subir Banner de Portada */}
+                <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-xl space-y-3">
+                  <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="w-full sm:w-48 h-24 rounded-xl bg-slate-900 border border-slate-700 shadow-sm overflow-hidden relative flex items-center justify-center text-white flex-shrink-0 group">
+                      {bannerUrl ? (
+                        <img src={bannerUrl} alt="Banner Hero" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-center p-2">
+                          <span className="material-symbols-outlined text-slate-400 text-[24px]">image</span>
+                          <span className="block text-[10px] text-slate-400 font-bold">Sin Portada</span>
+                        </div>
+                      )}
+                      {uploadingBanner && (
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-[10px] font-bold">
+                          Subiendo...
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5 flex-1">
+                      <h5 className="font-bold text-slate-800 text-xs">Imagen de Portada / Banner Hero</h5>
+                      <p className="text-[11px] text-slate-500 font-medium">Recomendado: Imagen panorámica (1200x400px). Se mostrará en la parte superior de tu catálogo.</p>
+                      <div className="flex gap-2 pt-1">
+                        <label className={`px-3 py-1.5 border border-slate-200 bg-white rounded-lg text-xs font-bold text-slate-700 hover:border-slate-300 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm ${!isUserAdmin || uploadingBanner ? 'opacity-50 pointer-events-none' : ''}`}>
+                          <span className="material-symbols-outlined text-[16px]">cloud_upload</span>
+                          <span>Subir Portada</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleUploadBanner}
+                            className="hidden"
+                            disabled={!isUserAdmin || uploadingBanner}
+                          />
+                        </label>
+                        {bannerUrl && (
+                          <button
+                            onClick={() => setBannerUrl('')}
+                            type="button"
+                            className="px-3 py-1.5 border border-red-100 bg-red-50 text-red-600 rounded-lg text-xs font-bold hover:bg-red-100 transition-all flex items-center gap-1"
+                            disabled={!isUserAdmin}
+                          >
+                            <span className="material-symbols-outlined text-[16px]">delete</span>
+                            <span>Eliminar</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 text-xs font-semibold">
+                    <div className="space-y-1">
+                      <label className="block text-[10px] text-slate-600 uppercase tracking-wider">Título Principal del Banner</label>
+                      <input
+                        type="text"
+                        value={bannerTitle}
+                        onChange={(e) => setBannerTitle(e.target.value)}
+                        placeholder="Ej: 🎉 ¡Gran Venta de Temporada!"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 text-xs"
+                        disabled={!isUserAdmin}
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-[10px] text-slate-600 uppercase tracking-wider">Barra de Anuncio Promocional (Top Bar)</label>
+                      <input
+                        type="text"
+                        value={promoText}
+                        onChange={(e) => setPromoText(e.target.value)}
+                        placeholder="Ej: 🚀 ¡Envíos gratis por compras mayores a S/100!"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 text-xs"
+                        disabled={!isUserAdmin}
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="block text-[10px] text-slate-600 uppercase tracking-wider">Subtítulo / Descripción del Banner</label>
+                      <input
+                        type="text"
+                        value={bannerSubtitle}
+                        onChange={(e) => setBannerSubtitle(e.target.value)}
+                        placeholder="Ej: Los mejores productos directo a tu hogar. Paga contra entrega o por Yape/Plin."
+                        className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600 text-xs"
+                        disabled={!isUserAdmin}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
