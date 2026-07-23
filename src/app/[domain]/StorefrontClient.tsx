@@ -51,8 +51,12 @@ interface Product {
   slug: string
   description: string | null
   price: number
+  compare_at_price?: number | null
   images: string[]
   category_id: string | null
+  is_active?: boolean
+  stock_quantity?: number | null
+  sku?: string | null
   product_options: Option[]
 }
 
@@ -770,133 +774,340 @@ export default function StorefrontClient({ store, categories, products, shipping
           </div>
         </div>
 
-        {/* Contenido Principal Full Width */}
-        <div className="flex-grow max-w-7xl w-full mx-auto px-12 py-8">
-          <main className="flex flex-col min-h-[400px]">
-            <div className="mb-6 flex justify-between items-center">
-              <h2 className="text-lg font-black text-slate-800 uppercase tracking-wider">
-                {selectedCategoryId === 'all' ? 'Catálogo Completo' : categories.find(c => c.id === selectedCategoryId)?.name || 'Catálogo'}
-              </h2>
-              <span className="text-xs text-slate-400 font-bold uppercase">
-                {sortedProducts.length} {sortedProducts.length === 1 ? 'artículo' : 'artículos'}
-              </span>
-            </div>
-
-            {sortedProducts.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center py-20 text-center max-w-md mx-auto">
-                <ShoppingBag className="w-16 h-16 text-slate-200 mb-4 animate-bounce" />
-                <h3 className="text-lg font-bold text-slate-800">No encontramos productos</h3>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                  Prueba seleccionando otra categoría o modificando los términos de búsqueda.
-                </p>
-              </div>
-            ) : viewLayout === 'instaview' ? (
-              /* Grid Premium de 4 columnas */
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {sortedProducts.map((prod, index) => (
-                  <Link 
-                    key={prod.id}
-                    href={getProductLink(prod.slug)}
-                    className="border border-slate-100 rounded-2xl bg-white overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative"
-                    style={{ animationDelay: `${index * 40}ms` }}
+        {/* Contenido Principal con Sidebar Kyte en Escritorio */}
+        <div className="flex-grow max-w-7xl w-full mx-auto px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* COLUMNA IZQUIERDA: SIDEBAR KYTE STYLE */}
+            <aside className="hidden lg:flex lg:col-span-3 flex-col space-y-7 bg-white border border-slate-100 rounded-3xl p-6 shadow-xs h-fit sticky top-24">
+              
+              {/* Categorías */}
+              <div className="space-y-3">
+                <h3 className="font-black text-slate-900 text-sm tracking-tight uppercase">Categorías</h3>
+                <div className="space-y-1 text-xs font-bold text-slate-600">
+                  <button
+                    onClick={() => setSelectedCategoryId('all')}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left ${
+                      selectedCategoryId === 'all'
+                        ? 'text-[var(--tenant-primary)] bg-blue-50/80 font-black'
+                        : 'hover:bg-slate-50 text-slate-600'
+                    }`}
                   >
-                    <div>
-                      {prod.images[0] ? (
-                        <div className="w-full aspect-square relative bg-slate-50 overflow-hidden border-b border-slate-50">
-                          <img 
-                            src={getOptimizedImageUrl(prod.images[0], { width: 400, height: 400 })} 
-                            alt={prod.title} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            loading="lazy"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-full aspect-square bg-slate-50 border-b border-slate-100 flex items-center justify-center text-slate-300">
-                          <ShoppingBag className="w-10 h-10" />
-                        </div>
-                      )}
+                    <CheckCircle className={`w-4 h-4 ${selectedCategoryId === 'all' ? 'text-[var(--tenant-primary)] opacity-100' : 'opacity-0'}`} />
+                    <span>Todo</span>
+                  </button>
 
-                      <div className="p-4 space-y-2">
-                        <h4 className="font-bold text-slate-800 group-hover:text-[var(--tenant-primary)] transition-colors text-[13px] leading-tight line-clamp-2">
-                          {prod.title}
-                        </h4>
-                        {prod.description && (
-                          <p className="text-[11px] text-slate-400 line-clamp-2 leading-normal">
-                            {prod.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="p-4 pt-0 flex justify-between items-center mt-auto">
-                      <span className="font-black text-slate-900 text-sm">{formatPrice(prod.price)}</span>
-                      <button 
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          handleProductClick(prod)
-                        }}
-                        className="px-4 py-1.5 bg-slate-900 hover:bg-[var(--tenant-primary)] text-white rounded-xl text-[11px] font-bold uppercase transition-colors shadow-sm"
-                      >
-                        Añadir
-                      </button>
-                    </div>
-                  </Link>
-                ))}
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategoryId(cat.id)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left ${
+                        selectedCategoryId === cat.id
+                          ? 'text-[var(--tenant-primary)] bg-blue-50/80 font-black'
+                          : 'hover:bg-slate-50 text-slate-600'
+                      }`}
+                    >
+                      <CheckCircle className={`w-4 h-4 ${selectedCategoryId === cat.id ? 'text-[var(--tenant-primary)] opacity-100' : 'opacity-0'}`} />
+                      <span>{cat.name}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            ) : (
-              /* Lista Premium */
-              <div className="space-y-4 max-w-4xl mx-auto w-full">
-                {sortedProducts.map((prod, index) => (
-                  <Link 
-                    key={prod.id}
-                    href={getProductLink(prod.slug)}
-                    className="border border-slate-100 rounded-2xl bg-white p-4 hover:shadow-lg transition-all duration-300 flex items-center gap-4 justify-between group"
-                    style={{ animationDelay: `${index * 40}ms` }}
+
+              {/* Ordenar por */}
+              <div className="space-y-3 pt-5 border-t border-slate-100">
+                <h3 className="font-black text-slate-900 text-sm tracking-tight uppercase">Ordenar por</h3>
+                <div className="space-y-1 text-xs font-bold text-slate-600">
+                  {[
+                    { id: 'categories', label: 'Categorías' },
+                    { id: 'lowest', label: 'Menor precio' },
+                    { id: 'highest', label: 'Mayor precio' },
+                    { id: 'az', label: 'Nombre A-Z' },
+                    { id: 'za', label: 'Nombre Z-A' },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setSortBy(item.id as any)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl transition-all text-left ${
+                        sortBy === item.id
+                          ? 'text-[var(--tenant-primary)] font-black'
+                          : 'hover:bg-slate-50 text-slate-500'
+                      }`}
+                    >
+                      <CheckCircle className={`w-3.5 h-3.5 ${sortBy === item.id ? 'text-[var(--tenant-primary)] opacity-100' : 'opacity-0'}`} />
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Modo de Exhibición */}
+              <div className="space-y-3 pt-5 border-t border-slate-100">
+                <h3 className="font-black text-slate-900 text-sm tracking-tight uppercase">Modo de exhibición</h3>
+                <div className="space-y-1.5 text-xs font-bold text-slate-600">
+                  <button
+                    onClick={() => setViewLayout('instaview')}
+                    className={`w-full flex items-center gap-2.5 px-3.5 py-2 rounded-xl transition-all ${
+                      viewLayout === 'instaview'
+                        ? 'text-[var(--tenant-primary)] bg-blue-50/80 font-black border border-blue-200/50'
+                        : 'hover:bg-slate-50 text-slate-500 border border-transparent'
+                    }`}
                   >
-                    <div className="flex items-center gap-4 min-w-0">
-                      {prod.images[0] ? (
-                        <img 
-                          src={getOptimizedImageUrl(prod.images[0], { width: 150, height: 150 })} 
-                          alt={prod.title} 
-                          className="w-16 h-16 rounded-xl object-cover border border-slate-50 flex-shrink-0 group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 flex-shrink-0">
-                          <ShoppingBag className="w-6 h-6" />
-                        </div>
-                      )}
+                    <LayoutGrid className="w-4 h-4" />
+                    <span>Instaview (Cuadrícula)</span>
+                  </button>
 
-                      <div className="space-y-1 min-w-0">
-                        <h4 className="font-bold text-slate-800 group-hover:text-[var(--tenant-primary)] transition-colors text-[13px] leading-tight line-clamp-1">
-                          {prod.title}
-                        </h4>
-                        {prod.description && (
-                          <p className="text-[11px] text-slate-400 line-clamp-1 leading-normal">
-                            {prod.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 flex-shrink-0">
-                      <span className="font-black text-slate-900 text-sm">{formatPrice(prod.price)}</span>
-                      <button 
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          handleProductClick(prod)
-                        }}
-                        className="px-4 py-1.5 bg-slate-900 hover:bg-[var(--tenant-primary)] text-white rounded-xl text-[11px] font-bold uppercase transition-colors shadow-sm"
-                      >
-                        Añadir
-                      </button>
-                    </div>
-                  </Link>
-                ))}
+                  <button
+                    onClick={() => setViewLayout('list')}
+                    className={`w-full flex items-center gap-2.5 px-3.5 py-2 rounded-xl transition-all ${
+                      viewLayout === 'list'
+                        ? 'text-[var(--tenant-primary)] bg-blue-50/80 font-black border border-blue-200/50'
+                        : 'hover:bg-slate-50 text-slate-500 border border-transparent'
+                    }`}
+                  >
+                    <List className="w-4 h-4" />
+                    <span>Lista</span>
+                  </button>
+                </div>
               </div>
-            )}
-          </main>
+
+              {/* Información del Comercio */}
+              <div className="space-y-3 pt-6 border-t border-slate-100 text-xs text-slate-600 font-medium">
+                <h3 className="font-black text-slate-900 text-sm tracking-tight uppercase">Información del comercio</h3>
+                
+                {store.whatsapp_phone && (
+                  <a href={`https://wa.me/${store.whatsapp_phone.replace('+', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 hover:text-emerald-600 transition-colors py-1">
+                    <MessageSquare className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                    <span className="font-bold">{store.whatsapp_phone}</span>
+                  </a>
+                )}
+
+                {store.contact_email && (
+                  <div className="flex items-center gap-2.5 py-1">
+                    <Mail className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span className="truncate">{store.contact_email}</span>
+                  </div>
+                )}
+
+                {store.instagram_handle && (
+                  <div className="flex items-center gap-2.5 py-1">
+                    <Phone className="w-4 h-4 text-pink-500 flex-shrink-0" />
+                    <span>@{store.instagram_handle.replace('@', '')}</span>
+                  </div>
+                )}
+
+                {store.address_details && (
+                  <div className="flex items-start gap-2.5 py-1">
+                    <MapPin className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                    <span className="leading-snug">{store.address_details}</span>
+                  </div>
+                )}
+
+                {store.description && (
+                  <p className="text-[11px] text-slate-400 italic pt-2 leading-relaxed border-t border-slate-100">
+                    "{store.description}"
+                  </p>
+                )}
+              </div>
+            </aside>
+
+            {/* COLUMNA DERECHA: PRODUCTOS */}
+            <main className="col-span-12 lg:col-span-9 flex flex-col min-h-[400px]">
+              <div className="mb-6 flex justify-between items-center bg-white border border-slate-100 rounded-2xl px-6 py-4 shadow-xs">
+                <h2 className="text-base font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <span>{selectedCategoryId === 'all' ? 'Todo los productos' : categories.find(c => c.id === selectedCategoryId)?.name || 'Catálogo'}</span>
+                </h2>
+                <span className="text-xs text-slate-500 font-bold uppercase bg-slate-100 px-3 py-1 rounded-full">
+                  {sortedProducts.length} {sortedProducts.length === 1 ? 'artículo' : 'artículos'}
+                </span>
+              </div>
+
+              {sortedProducts.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center py-20 text-center max-w-md mx-auto bg-white border border-slate-100 rounded-3xl">
+                  <ShoppingBag className="w-16 h-16 text-slate-200 mb-4 animate-bounce" />
+                  <h3 className="text-lg font-bold text-slate-800">No encontramos productos</h3>
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                    Prueba seleccionando otra categoría o modificando los términos de búsqueda.
+                  </p>
+                </div>
+              ) : viewLayout === 'instaview' ? (
+                /* Grid Kyte / Instaview de 3 a 4 columnas */
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  {sortedProducts.map((prod, index) => {
+                    const categoryName = categories.find(c => c.id === prod.category_id)?.name
+                    const isOutOfStock = prod.is_active === false || (prod.stock_quantity !== undefined && prod.stock_quantity !== null && prod.stock_quantity <= 0)
+                    const hasDiscount = prod.compare_at_price && prod.compare_at_price > prod.price
+                    const discountPercent = hasDiscount ? Math.round(((prod.compare_at_price! - prod.price) / prod.compare_at_price!) * 100) : 0
+
+                    return (
+                      <Link 
+                        key={prod.id}
+                        href={getProductLink(prod.slug)}
+                        className="border border-slate-100 rounded-3xl bg-white overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative"
+                        style={{ animationDelay: `${index * 40}ms` }}
+                      >
+                        <div>
+                          {/* Contenedor de Imagen con Badges e Icono Flotante + */}
+                          <div className="w-full aspect-square relative bg-slate-50 overflow-hidden border-b border-slate-100">
+                            {prod.images[0] ? (
+                              <img 
+                                src={getOptimizedImageUrl(prod.images[0], { width: 400, height: 400 })} 
+                                alt={prod.title} 
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-slate-50 flex items-center justify-center text-slate-300">
+                                <ShoppingBag className="w-10 h-10" />
+                              </div>
+                            )}
+
+                            {/* Badge Descuento e.g. 8% OFF */}
+                            {hasDiscount && (
+                              <span className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black px-2.5 py-1 rounded-md shadow-md uppercase tracking-wider">
+                                {discountPercent}% OFF
+                              </span>
+                            )}
+
+                            {/* Badge Agotado */}
+                            {isOutOfStock && (
+                              <span className="absolute inset-x-0 bottom-0 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-black py-1.5 text-center uppercase tracking-widest">
+                                AGOTADO
+                              </span>
+                            )}
+
+                            {/* Botón Circular Flotante + (Kyte Style) */}
+                            {!isOutOfStock && (
+                              <button 
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  handleProductClick(prod)
+                                }}
+                                className="absolute bottom-3 right-3 w-9 h-9 bg-[var(--tenant-primary)] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all z-10"
+                                title="Agregar al Carrito"
+                              >
+                                <Plus className="w-5 h-5 stroke-[2.5]" />
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Info del Producto */}
+                          <div className="p-4 space-y-1.5">
+                            <div className="flex items-center justify-between gap-1 text-[11px] text-slate-400 font-bold">
+                              {categoryName && (
+                                <span className="text-slate-500 truncate">{categoryName}</span>
+                              )}
+                              <span className="ml-auto font-mono text-[10px] text-slate-400">COD: {prod.sku || prod.id.slice(0, 5)}</span>
+                            </div>
+
+                            <h4 className="font-extrabold text-slate-900 group-hover:text-[var(--tenant-primary)] transition-colors text-sm leading-snug line-clamp-2">
+                              ⭐ {prod.title}
+                            </h4>
+
+                            {prod.description && (
+                              <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                                {prod.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Precios y Acción */}
+                        <div className="p-4 pt-0 flex justify-between items-baseline mt-auto">
+                          <div className="flex items-baseline gap-2">
+                            <span className="font-black text-slate-900 text-base">{formatPrice(prod.price)}</span>
+                            {hasDiscount && (
+                              <del className="text-slate-400 font-bold line-through text-xs">{formatPrice(prod.compare_at_price!)}</del>
+                            )}
+                          </div>
+
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleProductClick(prod)
+                            }}
+                            className="px-3.5 py-1.5 bg-slate-900 hover:bg-[var(--tenant-primary)] text-white rounded-xl text-[11px] font-extrabold uppercase transition-all shadow-xs"
+                          >
+                            Añadir
+                          </button>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              ) : (
+                /* Lista Kyte Style */
+                <div className="space-y-4 w-full">
+                  {sortedProducts.map((prod, index) => {
+                    const categoryName = categories.find(c => c.id === prod.category_id)?.name
+                    const isOutOfStock = prod.is_active === false || (prod.stock_quantity !== undefined && prod.stock_quantity !== null && prod.stock_quantity <= 0)
+                    const hasDiscount = prod.compare_at_price && prod.compare_at_price > prod.price
+
+                    return (
+                      <Link 
+                        key={prod.id}
+                        href={getProductLink(prod.slug)}
+                        className="border border-slate-100 rounded-2xl bg-white p-4 hover:shadow-lg transition-all duration-300 flex items-center gap-4 justify-between group"
+                        style={{ animationDelay: `${index * 40}ms` }}
+                      >
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-slate-50 flex-shrink-0 border border-slate-100">
+                            {prod.images[0] ? (
+                              <img 
+                                src={getOptimizedImageUrl(prod.images[0], { width: 150, height: 150 })} 
+                                alt={prod.title} 
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                <ShoppingBag className="w-6 h-6" />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-1 min-w-0">
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                              {categoryName && <span>{categoryName}</span>}
+                              <span>COD: {prod.sku || prod.id.slice(0, 5)}</span>
+                            </div>
+                            <h4 className="font-bold text-slate-900 group-hover:text-[var(--tenant-primary)] transition-colors text-sm leading-tight line-clamp-1">
+                              ⭐ {prod.title}
+                            </h4>
+                            {prod.description && (
+                              <p className="text-[11px] text-slate-400 line-clamp-1 leading-normal">
+                                {prod.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 flex-shrink-0">
+                          <div className="text-right">
+                            <span className="font-black text-slate-900 text-sm block">{formatPrice(prod.price)}</span>
+                            {hasDiscount && (
+                              <del className="text-slate-400 font-bold line-through text-[10px]">{formatPrice(prod.compare_at_price!)}</del>
+                            )}
+                          </div>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleProductClick(prod)
+                            }}
+                            className="px-4 py-2 bg-slate-900 hover:bg-[var(--tenant-primary)] text-white rounded-xl text-[11px] font-extrabold uppercase transition-all shadow-xs"
+                          >
+                            Añadir
+                          </button>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </main>
+          </div>
         </div>
 
         {/* Pie de Página Profesional de 3 Columnas */}
