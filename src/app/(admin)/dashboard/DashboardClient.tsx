@@ -293,14 +293,14 @@ export default function DashboardClient({ store, initialMetrics, planLimits }: D
           {/* Switch de Modo Demo */}
           <button 
             onClick={() => setIsDemoMode(!isDemoMode)}
-            className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-all flex items-center gap-1.5 h-10 select-none shadow-sm cursor-pointer ${
+            className={`px-4 py-2 rounded-xl border text-xs font-bold transition-all flex items-center gap-2 h-10 select-none shadow-sm cursor-pointer ${
               isDemoMode 
-                ? 'bg-amber-55 border-amber-200 text-amber-700 shadow-amber-100/50' 
-                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                ? 'bg-amber-50 border-amber-200 text-amber-700 shadow-amber-100/50' 
+                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-indigo-600'
             }`}
           >
-            <Activity className="w-3.5 h-3.5" />
-            <span>{isDemoMode ? 'Ver Datos Reales' : 'Probar Modo Demo'}</span>
+            <Activity className="w-4 h-4 text-indigo-500" />
+            <span>{isDemoMode ? 'Ver Datos Reales' : 'Probar Datos de Prueba en Vivo'}</span>
           </button>
 
           {/* Botón Visitar Tienda */}
@@ -313,12 +313,6 @@ export default function DashboardClient({ store, initialMetrics, planLimits }: D
             <Store className="w-4 h-4 text-slate-500 group-hover:text-indigo-600 transition-colors" />
             <span>Visitar Tienda</span>
           </a>
-
-          {/* Conexión en vivo */}
-          <div className="px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2 h-10 shadow-sm select-none">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-            <span className="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wider">En Vivo</span>
-          </div>
         </div>
       </div>
 
