@@ -2,9 +2,13 @@
 
 import React from 'react'
 import { Link } from 'next-view-transitions'
+import { usePathname } from 'next/navigation'
 import Logo from '@/components/marketing/Logo'
 
 export default function Footer() {
+  const pathname = usePathname()
+  if (pathname === '/login') return null
+
   return (
     <footer className="w-full border-t border-slate-200/60 bg-slate-50 py-12">
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-slate-500 font-semibold">
