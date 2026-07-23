@@ -120,6 +120,22 @@ export default function StorefrontClient({ store, categories, products, shipping
 
   // Detección de host para enlaces limpios (evitar duplicar slug en subdominios)
   const [isSubdomain, setIsSubdomain] = useState(false)
+
+  // Bloquear scroll del cuerpo cuando el carrito o modal de detalle de producto está abierto
+  useEffect(() => {
+    if (isCartOpen || selectedProduct) {
+      document.body.style.overflow = 'hidden'
+      document.body.style.touchAction = 'none'
+    } else {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+  }, [isCartOpen, selectedProduct])
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const host = window.location.hostname

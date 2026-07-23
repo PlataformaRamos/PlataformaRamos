@@ -67,6 +67,21 @@ export default function PaymentsClient({ initialPayments, initialStores }: Payme
   const [formError, setFormError] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
 
+  // Bloquear el scroll de la página de fondo cuando el modal de pago está abierto
+  React.useEffect(() => {
+    if (showModal) {
+      document.body.style.overflow = 'hidden'
+      document.body.style.touchAction = 'none'
+    } else {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+  }, [showModal])
+
   const getStoreName = (storeId: string) => {
     const store = stores.find(s => s.id === storeId)
     return store ? store.name : storeId.slice(0, 8) + '...'

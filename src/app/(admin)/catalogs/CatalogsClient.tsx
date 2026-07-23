@@ -64,6 +64,21 @@ export default function CatalogsClient({ store, initialCatalogs, products, initi
   const supabase = createClient()
   const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'localhost:3000'
 
+  // Bloquear el scroll de la página de fondo cuando el modal de catálogo está abierto
+  React.useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden'
+      document.body.style.touchAction = 'none'
+    } else {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+  }, [isModalOpen])
+
   // Generar slug automáticamente al cambiar el nombre
   const handleNameChange = (nameVal: string) => {
     setCatName(nameVal)

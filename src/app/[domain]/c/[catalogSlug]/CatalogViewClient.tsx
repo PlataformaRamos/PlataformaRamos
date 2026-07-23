@@ -129,6 +129,22 @@ export default function CatalogViewClient({ store, catalog, categories, products
 
   // Detección de host para enlaces limpios
   const [isSubdomain, setIsSubdomain] = useState(false)
+
+  // Bloquear scroll del cuerpo cuando el carrito o modal de detalle de producto está abierto
+  useEffect(() => {
+    if (isCartOpen || selectedProduct) {
+      document.body.style.overflow = 'hidden'
+      document.body.style.touchAction = 'none'
+    } else {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+  }, [isCartOpen, selectedProduct])
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const host = window.location.hostname

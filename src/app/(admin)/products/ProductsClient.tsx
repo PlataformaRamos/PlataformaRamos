@@ -125,6 +125,21 @@ export default function ProductsClient({ store, initialCategories, initialProduc
 
   const supabase = createClient()
 
+  // Bloquear el scroll de la página de fondo cuando el modal de producto está abierto
+  React.useEffect(() => {
+    if (isProductModalOpen) {
+      document.body.style.overflow = 'hidden'
+      document.body.style.touchAction = 'none'
+    } else {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+  }, [isProductModalOpen])
+
   // Subir imagen del producto a R2
   const handleUploadProductImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
