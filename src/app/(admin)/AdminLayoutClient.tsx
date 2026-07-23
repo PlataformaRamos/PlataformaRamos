@@ -29,6 +29,26 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const supabase = createClient()
 
+  // Bloquear el scroll de la página de fondo cuando el menú lateral móvil está abierto
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+      document.body.style.touchAction = 'none'
+    } else {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+  }, [mobileMenuOpen])
+
+  // Cerrar el menú lateral automáticamente al cambiar de página
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [pathname])
+
   // Escuchar cambios en la sesión de Supabase Auth para autorrefrescar de forma transparente los Server Components
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -159,7 +179,7 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
         <Button 
           onClick={handleLogout}
           variant="ghost" 
-          className="w-full justify-start text-on-surface-variant hover:text-red-600 hover:bg-red-50 gap-3 px-3 h-10 text-xs font-semibold"
+          className="w-full justify-start text-slate-300 hover:text-red-400 hover:bg-slate-800/80 gap-3 px-3 h-10 text-xs font-semibold transition-colors"
         >
           <span className="material-symbols-outlined text-red-500">logout</span>
           <span>Cerrar sesión</span>
@@ -197,17 +217,17 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
         <SidebarContent />
       </aside>
 
-      {/* Sidebar Móvil (Drawer animado) */}
+      {/* Sidebar Móvil (Drawer animado con backdrop bloqueante) */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <div className="md:hidden fixed inset-0 z-50 flex">
-            {/* Backdrop oscuro */}
+            {/* Backdrop oscuro que captura clics y evita scroll de fondo */}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-xs" 
+              className="fixed inset-0 bg-black/70 backdrop-blur-xs" 
               onClick={() => setMobileMenuOpen(false)} 
             />
             {/* Sidebar deslizante */}
@@ -216,7 +236,7 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="relative flex flex-col w-[280px] max-w-xs h-full bg-surface border-r border-border-subtle z-10"
+              className="relative flex flex-col w-[280px] max-w-[80vw] h-full bg-slate-900 border-r border-slate-800 z-10 overflow-hidden shadow-2xl"
             >
               <SidebarContent />
             </motion.aside>

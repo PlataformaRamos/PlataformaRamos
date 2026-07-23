@@ -33,6 +33,26 @@ export default function MasterLayoutClient({ profile, children }: MasterLayoutCl
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const supabase = createClient()
 
+  // Bloquear el scroll de la página de fondo cuando el menú lateral móvil está abierto
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+      document.body.style.touchAction = 'none'
+    } else {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+    }
+  }, [mobileMenuOpen])
+
+  // Cerrar el menú lateral automáticamente al cambiar de página
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [pathname])
+
   const navigation = [
     { name: 'Métricas', href: '/master/dashboard', icon: TrendingUp },
     { name: 'Tiendas', href: '/master/stores', icon: Store },
