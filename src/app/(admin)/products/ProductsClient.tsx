@@ -4,6 +4,7 @@ import React, { useState, useOptimistic } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
+import ConfirmModal from '@/components/ui/ConfirmModal'
 
 interface Category {
   id: string
@@ -415,15 +416,45 @@ export default function ProductsClient({ store, initialCategories, initialProduc
     }
   }
 
-  const handleDeleteProduct = async (prodId: string) => {
+  // Estados ConfirmModal de Eliminación (Productos y Categorías)
+  const [deleteProdId, setDeleteProdId] = useState<string | null>(null)
+  const [loadingDeleteProd, setLoadingDeleteProd] = useState(false)
+
+  const [deleteCatId, setDeleteCatId] = useState<string | null>(null)
+  const [loadingDeleteCat, setLoadingDeleteCat] = useState(false)
+
+  // Ejecutar Eliminar Producto
+  const handleConfirmDeleteProduct = async () => {
+    if (!deleteProdId) return
+    setLoadingDeleteProd(true)
+
     const { error } = await supabase
       .from('products')
       .delete()
-      .eq('id', prodId)
+      .eq('id', deleteProdId)
 
     if (!error) {
-      setProducts((prev) => prev.filter((p) => p.id !== prodId))
+      setProducts((prev) => prev.filter((p) => p.id !== deleteProdId))
     }
+    setLoadingDeleteProd(false)
+    setDeleteProdId(null)
+  }
+
+  // Ejecutar Eliminar Categoría
+  const handleConfirmDeleteCategory = async () => {
+    if (!deleteCatId) return
+    setLoadingDeleteCat(true)
+
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', deleteCatId)
+
+    if (!error) {
+      setCategories((prev) => prev.filter((cat) => cat.id !== deleteCatId))
+    }
+    setLoadingDeleteCat(false)
+    setDeleteCatId(null)
   }
 
   const formatCurrency = (amount: number) => {
@@ -1046,10 +1077,8 @@ export default function ProductsClient({ store, initialCategories, initialProduc
                   <button
                     type="button"
                     onClick={() => {
-                      if (confirm('¿Seguro que deseas eliminar este producto?')) {
-                        handleDeleteProduct(selectedProduct.id)
-                        setIsProductModalOpen(false)
-                      }
+                      setIsProductModalOpen(false)
+                      setDeleteProdId(selectedProduct.id)
                     }}
                     className="w-full py-2 bg-red-50 text-red-500 border border-red-100 hover:bg-red-100 hover:text-red-600 rounded font-bold transition-all text-xs flex justify-center items-center gap-1.5"
                   >
@@ -1082,6 +1111,32 @@ export default function ProductsClient({ store, initialCategories, initialProduc
           </div>
         )}
       </AnimatePresence>
+
+      {/* CONFIRM MODAL PRODUCTO */}
+      <ConfirmModal
+        isOpen={Boolean(deleteProdId)}
+        title="¿Eliminar producto permanentemente?"
+        description="Esta acción eliminará el producto del catálogo de tu tienda. No se podrá recuperar."
+        confirmText="Sí, Eliminar Producto"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={loadingDeleteProd}
+        onConfirm={handleConfirmDeleteProduct}
+        onClose={() => setDeleteProdId(null)}
+      />
+
+      {/* CONFIRM MODAL CATEGORÍA */}
+      <ConfirmModal
+        isOpen={Boolean(deleteCatId)}
+        title="¿Eliminar categoría?"
+        description="Esta acción eliminará la categoría. Los productos asignados a ella pasarán a no tener categoría."
+        confirmText="Sí, Eliminar Categoría"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={loadingDeleteCat}
+        onConfirm={handleConfirmDeleteCategory}
+        onClose={() => setDeleteCatId(null)}
+      />
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2, Plus, Edit2, Trash2, Globe, Check, AlertCircle, Sparkles, X, Share2, BookOpen } from 'lucide-react'
+import ConfirmModal from '@/components/ui/ConfirmModal'
 
 interface Catalog {
   id: string
@@ -230,24 +231,33 @@ export default function CatalogsClient({ store, initialCatalogs, products, initi
     }
   }
 
-  // Eliminar catálogo
-  const handleDeleteCatalog = async (catalogId: string) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar este catálogo? Los productos asociados no serán eliminados, pero la URL de este catálogo dejará de funcionar.')) {
-      return
-    }
+  // Estado ConfirmModal Eliminación Catálogo
+  const [deleteCatId, setDeleteCatId] = useState<string | null>(null)
+  const [loadingDeleteCat, setLoadingDeleteCat] = useState(false)
+
+  const triggerDeleteCatalog = (catalogId: string) => {
+    setDeleteCatId(catalogId)
+  }
+
+  const handleConfirmDeleteCatalog = async () => {
+    if (!deleteCatId) return
+    setLoadingDeleteCat(true)
 
     try {
       const { error: deleteError } = await supabase
         .from('catalogs')
         .delete()
-        .eq('id', catalogId)
+        .eq('id', deleteCatId)
 
       if (deleteError) throw new Error(deleteError.message)
 
-      setCatalogs((prev) => prev.filter((c) => c.id !== catalogId))
-      setRelations((prev) => prev.filter((r) => r.catalog_id !== catalogId))
+      setCatalogs((prev) => prev.filter((c) => c.id !== deleteCatId))
+      setRelations((prev) => prev.filter((r) => r.catalog_id !== deleteCatId))
     } catch (err: any) {
-      alert(err.message || 'Error al eliminar el catálogo.')
+      console.error(err.message || 'Error al eliminar el catálogo.')
+    } finally {
+      setLoadingDeleteCat(false)
+      setDeleteCatId(null)
     }
   }
 
@@ -361,7 +371,7 @@ export default function CatalogsClient({ store, initialCatalogs, products, initi
                       <span>Editar</span>
                     </Button>
                     <Button
-                      onClick={() => handleDeleteCatalog(catalog.id)}
+                      onClick={() => triggerDeleteCatalog(catalog.id)}
                       variant="ghost"
                       className="h-8 text-[10px] font-bold text-slate-400 hover:text-red-600 hover:bg-red-50 flex items-center gap-1 px-3.5 rounded-lg"
                     >
@@ -439,94 +449,87 @@ export default function CatalogsClient({ store, initialCatalogs, products, initi
                   />
                 </div>
 
-                {/* Slug (URL Enlace) */}
+                {/* Slug */}
                 <div className="space-y-1.5">
                   <label className="text-slate-700 font-bold">Enlace del Catálogo (Slug)</label>
-                  <div className="flex gap-1.5 items-center">
-                    <span className="px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 font-bold text-slate-400 text-xs font-mono select-none">
+                  <div className="flex items-center">
+                    <span className="bg-slate-50 border border-r-0 border-slate-200 rounded-l-xl px-3 py-2.5 text-slate-400 text-xs font-medium">
                       /c/
                     </span>
                     <input
                       type="text"
                       value={catSlug}
-                      onChange={(e) => setCatSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                      onChange={(e) => setCatSlug(e.target.value)}
                       required
-                      className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-mono text-slate-800 transition-all text-xs"
-                      placeholder="ej-coleccion-verano"
+                      className="w-full px-4 py-2.5 border border-slate-200 rounded-r-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium text-slate-800 transition-all text-xs"
+                      placeholder="coleccion-verano"
                     />
                   </div>
-                  <p className="text-[10px] text-slate-400 font-medium">
-                    Enlace público: <span className="font-bold text-blue-600 font-mono">{store.slug}.{rootDomain}/c/{catSlug || 'enlace'}</span>
-                  </p>
                 </div>
 
                 {/* Descripción */}
                 <div className="space-y-1.5">
                   <label className="text-slate-700 font-bold">Descripción (Opcional)</label>
                   <textarea
+                    rows={2}
                     value={catDesc}
                     onChange={(e) => setCatDesc(e.target.value)}
-                    rows={3}
                     className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white font-medium text-slate-800 transition-all text-xs"
                     placeholder="Breve descripción del catálogo..."
                   />
                 </div>
 
-                {/* Ajustes de Switches (Activo / Predeterminado) */}
-                <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 border border-slate-100 rounded-2xl select-none">
-                  <div className="flex items-center gap-3">
+                {/* Toggles */}
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-100 rounded-xl">
+                    <div>
+                      <div className="font-bold text-slate-900 text-xs">Catálogo Activo</div>
+                      <div className="text-[10px] text-slate-400 font-medium">Visible para los clientes en la web</div>
+                    </div>
                     <input
                       type="checkbox"
-                      id="catActive"
                       checked={catActive}
                       onChange={(e) => setCatActive(e.target.checked)}
                       className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
-                    <label htmlFor="catActive" className="text-slate-700 font-bold cursor-pointer">
-                      Catálogo Activo
-                    </label>
                   </div>
-                  
-                  <div className="flex items-center gap-3">
+
+                  <div className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-100 rounded-xl">
+                    <div>
+                      <div className="font-bold text-slate-900 text-xs">Catálogo por Defecto</div>
+                      <div className="text-[10px] text-slate-400 font-medium">Se muestra al entrar a la tienda principal</div>
+                    </div>
                     <input
                       type="checkbox"
-                      id="catDefault"
                       checked={catDefault}
                       onChange={(e) => setCatDefault(e.target.checked)}
                       className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
-                    <label htmlFor="catDefault" className="text-slate-700 font-bold cursor-pointer">
-                      Predeterminado
-                    </label>
                   </div>
                 </div>
 
-                {/* SECTOR ASIGNACIÓN DE PRODUCTOS */}
+                {/* Selección de Productos */}
                 <div className="space-y-3 pt-2">
                   <div className="flex justify-between items-center">
-                    <label className="text-slate-700 font-bold flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                      <span>Asignar Productos al Catálogo</span>
-                    </label>
-                    <span className="text-[10px] text-slate-400 font-bold">
-                      {selectedProdIds.length} seleccionados
-                    </span>
+                    <label className="text-slate-700 font-bold">Asignar Productos ({selectedProdIds.length} seleccionados)</label>
                   </div>
 
                   {products.length === 0 ? (
-                    <div className="border border-slate-200/60 rounded-2xl p-6 text-center bg-slate-50/50">
-                      <p className="text-[10.5px] text-slate-500 font-medium">No tienes productos en tu tienda. Agrégalos en la sección de Productos.</p>
+                    <div className="text-center py-6 text-slate-400 text-xs">
+                      No hay productos registrados en tu tienda aún.
                     </div>
                   ) : (
-                    <div className="border border-slate-200/80 rounded-2xl overflow-hidden max-h-[300px] overflow-y-auto divide-y divide-slate-100">
+                    <div className="max-h-48 overflow-y-auto space-y-2 pr-1">
                       {products.map((prod) => {
                         const isChecked = selectedProdIds.includes(prod.id)
                         return (
-                          <div 
-                            key={prod.id} 
+                          <div
+                            key={prod.id}
                             onClick={() => handleToggleProduct(prod.id)}
-                            className={`p-3 flex items-center gap-3.5 cursor-pointer hover:bg-slate-50 transition-colors ${
-                              isChecked ? 'bg-blue-50/20' : ''
+                            className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center gap-3 ${
+                              isChecked
+                                ? 'bg-blue-50/60 border-blue-200'
+                                : 'bg-white border-slate-100 hover:bg-slate-50'
                             }`}
                           >
                             <input
@@ -587,6 +590,18 @@ export default function CatalogsClient({ store, initialCatalogs, products, initi
         )}
       </AnimatePresence>
 
+      {/* CONFIRM MODAL ELIMINAR CATÁLOGO */}
+      <ConfirmModal
+        isOpen={Boolean(deleteCatId)}
+        title="¿Eliminar catálogo permanentemente?"
+        description="Esta acción eliminará el catálogo y deshabilitará su enlace público. Los productos asociados se conservarán en tu tienda."
+        confirmText="Sí, Eliminar Catálogo"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={loadingDeleteCat}
+        onConfirm={handleConfirmDeleteCatalog}
+        onClose={() => setDeleteCatId(null)}
+      />
     </div>
   )
 }

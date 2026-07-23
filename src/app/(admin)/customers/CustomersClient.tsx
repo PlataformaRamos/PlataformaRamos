@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import ConfirmModal from '@/components/ui/ConfirmModal'
 
 interface Customer {
   id: string
@@ -113,19 +114,31 @@ export default function CustomersClient({ store, initialCustomers }: CustomersCl
     setLoadingSave(false)
   }
 
-  // Eliminar Cliente
-  const handleDeleteCustomer = async (customerId: string, e: React.MouseEvent) => {
+  // Estado ConfirmModal de Eliminación de Cliente
+  const [deleteCustId, setDeleteCustId] = useState<string | null>(null)
+  const [loadingDelete, setLoadingDelete] = useState(false)
+
+  // Disparar Modal de Confirmación
+  const triggerDeleteCustomer = (customerId: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!confirm('¿Estás seguro de eliminar este registro de cliente?')) return
+    setDeleteCustId(customerId)
+  }
+
+  // Ejecutar Eliminar Cliente
+  const handleConfirmDeleteCustomer = async () => {
+    if (!deleteCustId) return
+    setLoadingDelete(true)
 
     const { error } = await supabase
       .from('customers')
       .delete()
-      .eq('id', customerId)
+      .eq('id', deleteCustId)
 
     if (!error) {
-      setCustomers((prev) => prev.filter((c) => c.id !== customerId))
+      setCustomers((prev) => prev.filter((c) => c.id !== deleteCustId))
     }
+    setLoadingDelete(false)
+    setDeleteCustId(null)
   }
 
   // Segmentación y filtros
@@ -326,7 +339,7 @@ export default function CustomersClient({ store, initialCustomers }: CustomersCl
                             <span className="material-symbols-outlined text-[18px]">edit</span>
                           </button>
                           <button 
-                            onClick={(e) => handleDeleteCustomer(cust.id, e)}
+                            onClick={(e) => triggerDeleteCustomer(cust.id, e)}
                             className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                             title="Eliminar cliente"
                           >
@@ -413,6 +426,19 @@ export default function CustomersClient({ store, initialCustomers }: CustomersCl
           </div>
         </div>
       )}
+
+      {/* CONFIRM MODAL ELIMINAR CLIENTE */}
+      <ConfirmModal
+        isOpen={Boolean(deleteCustId)}
+        title="¿Eliminar cliente permanentemente?"
+        description="Esta acción eliminará la ficha de datos del comprador de tu tienda. Los pedidos previos conservarán su historial."
+        confirmText="Sí, Eliminar Cliente"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={loadingDelete}
+        onConfirm={handleConfirmDeleteCustomer}
+        onClose={() => setDeleteCustId(null)}
+      />
     </div>
   )
 }
