@@ -10,8 +10,6 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
 
-  if (pathname === '/login') return null
-
   // Cerrar el menú automáticamente al cambiar de ruta
   useEffect(() => {
     setMobileMenuOpen(false)
@@ -28,6 +26,8 @@ export default function Header() {
       document.body.style.overflow = ''
     }
   }, [mobileMenuOpen])
+
+  if (pathname === '/login') return null
 
   const navLinks = [
     { href: '/caracteristicas', label: 'Características' },
