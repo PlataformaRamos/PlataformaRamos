@@ -170,15 +170,15 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
 
   return (
     <div className="min-h-screen bg-slate-50 text-on-surface flex flex-col md:flex-row antialiased">
-      {/* Menú de Cabecera Móvil Estilizado */}
-      <div className="md:hidden bg-slate-900 text-white border-b border-slate-800 px-4 py-3 flex justify-between items-center z-40 sticky top-0 shadow-md">
+      {/* Menú de Cabecera Móvil 100% Fijo (Fixed Top Navbar) */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-slate-900/95 backdrop-blur-md text-white border-b border-slate-800/80 px-4 flex justify-between items-center z-40 shadow-md">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-black text-xs shadow-xs">
             R
           </div>
           <div className="flex flex-col">
             <span className="font-black text-xs tracking-wider uppercase leading-none">PLATAFORMA RAMOS</span>
-            <span className="text-[9.5px] text-slate-400 font-semibold truncate max-w-[150px] leading-tight">
+            <span className="text-[9.5px] text-slate-400 font-semibold truncate max-w-[170px] leading-tight mt-0.5">
               {store ? store.name : 'Panel Admin'}
             </span>
           </div>
@@ -225,7 +225,7 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
       </AnimatePresence>
 
       {/* Contenido Principal de Trabajo */}
-      <div className="flex-1 flex flex-col md:ml-[280px] min-h-screen">
+      <div className="flex-1 flex flex-col md:ml-[280px] min-h-screen pt-14 md:pt-0">
         <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/80 h-16 px-6 hidden md:flex items-center justify-between sticky top-0 z-30 shadow-subtle">
           <div className="flex items-center bg-slate-100/70 hover:bg-slate-100 rounded-xl px-3.5 py-1.5 w-72 border border-slate-200/60 transition-colors">
             <span className="material-symbols-outlined text-slate-400 mr-2 text-[18px]">search</span>
