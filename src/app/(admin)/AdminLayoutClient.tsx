@@ -92,13 +92,18 @@ export default function AdminLayoutClient({ profile, store, children }: AdminLay
               href={publicStoreUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 inline-flex items-center justify-between px-3 py-2 bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white text-[11px] font-bold rounded-xl transition-all border border-slate-700/60 shadow-xs group"
+              className="mt-3 flex items-center justify-between px-3 py-2.5 bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white rounded-xl transition-all border border-slate-700/60 shadow-xs group"
             >
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Tienda Pública</span>
+              <div className="flex items-center gap-2.5 min-w-0 pr-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+                <div className="flex flex-col min-w-0 text-left">
+                  <span className="text-[11px] font-bold text-white leading-tight">Visitar mi Tienda</span>
+                  <span className="text-[9.5px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors truncate font-semibold">
+                    {store.slug}.{process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'rutaslima.app'}
+                  </span>
+                </div>
               </div>
-              <span className="material-symbols-outlined text-[15px] group-hover:translate-x-0.5 transition-transform text-slate-400">open_in_new</span>
+              <span className="material-symbols-outlined text-[15px] group-hover:translate-x-0.5 transition-transform text-slate-400 flex-shrink-0">open_in_new</span>
             </a>
           )}
         </div>
