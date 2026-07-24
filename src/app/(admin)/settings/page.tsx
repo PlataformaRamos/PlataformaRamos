@@ -1,6 +1,11 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getAdminStoreOrRedirect } from '@/lib/supabase/storeHelper'
 import SettingsClient from './SettingsClient'
+
+export const metadata: Metadata = {
+  title: 'Ajustes de la Tienda',
+}
 
 export default async function SettingsPage() {
   const { store, user } = await getAdminStoreOrRedirect()

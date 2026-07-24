@@ -1,8 +1,13 @@
+import type { Metadata } from 'next'
 import React from 'react'
 import { createClient } from '@/lib/supabase/server'
 import SettingsClient from './SettingsClient'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Configuración del Sistema - Master',
+}
 
 export default async function MasterSettingsPage() {
   const supabase = await createClient()

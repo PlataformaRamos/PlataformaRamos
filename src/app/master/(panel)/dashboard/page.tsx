@@ -1,8 +1,13 @@
+import type { Metadata } from 'next'
 import React from 'react'
 import { createClient } from '@/lib/supabase/server'
 import DashboardClient from './DashboardClient'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Panel Master',
+}
 
 export default async function MasterDashboardPage() {
   const supabase = await createClient()

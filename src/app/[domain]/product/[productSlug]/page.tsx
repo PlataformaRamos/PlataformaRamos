@@ -2,11 +2,41 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import ProductDetailClient from './ProductDetailClient'
 
+import type { Metadata } from 'next'
+
 interface ProductPageProps {
   params: Promise<{
     domain: string
     productSlug: string
   }>
+}
+
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { domain, productSlug } = await params
+  const supabase = await createClient()
+  const { data: store } = await supabase
+    .from('stores')
+    .select('id, name')
+    .or(`slug.eq.${domain},custom_domain.eq.${domain}`)
+    .single()
+
+  if (!store) return { title: { absolute: 'Producto No Encontrado' } }
+
+  const { data: product } = await supabase
+    .from('products')
+    .select('title, description, price')
+    .eq('store_id', store.id)
+    .eq('slug', productSlug)
+    .single()
+
+  if (!product) return { title: { absolute: 'Producto No Encontrado' } }
+
+  return {
+    title: {
+      absolute: `${product.title} | ${store.name}`
+    },
+    description: product.description || `${product.title} disponible en ${store.name}`
+  }
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {

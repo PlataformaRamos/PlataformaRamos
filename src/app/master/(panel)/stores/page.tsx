@@ -1,8 +1,13 @@
+import type { Metadata } from 'next'
 import React from 'react'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import StoresClient from './StoresClient'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Gestión de Tiendas - Master',
+}
 
 export default async function MasterStoresPage() {
   // Crear cliente administrativo de Supabase (Bypass RLS)

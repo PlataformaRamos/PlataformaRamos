@@ -1,8 +1,13 @@
+import type { Metadata } from 'next'
 import React from 'react'
 import { createClient } from '@/lib/supabase/server'
 import UsersClient from './UsersClient'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Usuarios y Permisos - Master',
+}
 
 export default async function MasterUsersPage() {
   const supabase = await createClient()

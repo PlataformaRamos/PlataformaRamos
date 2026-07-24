@@ -1,6 +1,11 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getAdminStoreOrRedirect } from '@/lib/supabase/storeHelper'
 import CatalogsClient from './CatalogsClient'
+
+export const metadata: Metadata = {
+  title: 'Mis Catálogos',
+}
 
 export default async function CatalogsPage() {
   const { store } = await getAdminStoreOrRedirect()

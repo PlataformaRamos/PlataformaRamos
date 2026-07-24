@@ -2,8 +2,38 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import CatalogViewClient from './CatalogViewClient'
 
+import type { Metadata } from 'next'
+
 interface CatalogPageProps {
   params: Promise<{ domain: string; catalogSlug: string }>
+}
+
+export async function generateMetadata({ params }: CatalogPageProps): Promise<Metadata> {
+  const { domain, catalogSlug } = await params
+  const supabase = await createClient()
+  const { data: store } = await supabase
+    .from('stores')
+    .select('id, name')
+    .or(`slug.eq.${domain},custom_domain.eq.${domain}`)
+    .single()
+
+  if (!store) return { title: { absolute: 'Catálogo No Encontrado' } }
+
+  const { data: catalog } = await supabase
+    .from('catalogs')
+    .select('name, description')
+    .eq('store_id', store.id)
+    .eq('slug', catalogSlug)
+    .single()
+
+  if (!catalog) return { title: { absolute: 'Catálogo No Encontrado' } }
+
+  return {
+    title: {
+      absolute: `${catalog.name} | ${store.name}`
+    },
+    description: catalog.description || `Catálogo ${catalog.name} en ${store.name}`
+  }
 }
 
 export default async function CatalogPage({ params }: CatalogPageProps) {

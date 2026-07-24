@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Mail, Lock, Loader2, ArrowRight, ShieldAlert, ArrowLeft } from 'lucide-react'
@@ -8,6 +8,10 @@ import Link from 'next/link'
 import AuthTransitionOverlay from '@/components/auth/AuthTransitionOverlay'
 
 export default function MasterLoginPage() {
+  useEffect(() => {
+    document.title = 'Acceso Master | Plataforma Ramos'
+  }, [])
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)

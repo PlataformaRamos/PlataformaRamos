@@ -1,6 +1,11 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getAdminStoreOrRedirect } from '@/lib/supabase/storeHelper'
 import DashboardClient from './DashboardClient'
+
+export const metadata: Metadata = {
+  title: 'Panel de Control',
+}
 
 export default async function DashboardPage() {
   const { store } = await getAdminStoreOrRedirect()

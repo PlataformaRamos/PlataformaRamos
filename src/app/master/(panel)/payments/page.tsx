@@ -1,8 +1,13 @@
+import type { Metadata } from 'next'
 import React from 'react'
 import { createClient } from '@/lib/supabase/server'
 import PaymentsClient from './PaymentsClient'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Historial de Pagos - Master',
+}
 
 export default async function MasterPaymentsPage() {
   const supabase = await createClient()

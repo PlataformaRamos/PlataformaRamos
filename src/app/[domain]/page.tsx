@@ -4,8 +4,33 @@ import StorefrontClient from './StorefrontClient'
 import StorefrontCatalogsClient from './StorefrontCatalogsClient'
 import StoreSuspendedScreen from './StoreSuspendedScreen'
 
+import type { Metadata } from 'next'
+
 interface TenantPageProps {
   params: Promise<{ domain: string }>
+}
+
+export async function generateMetadata({ params }: TenantPageProps): Promise<Metadata> {
+  const { domain } = await params
+  const supabase = await createClient()
+  const { data: store } = await supabase
+    .from('stores')
+    .select('name, description')
+    .or(`slug.eq.${domain},custom_domain.eq.${domain}`)
+    .single()
+
+  if (!store) {
+    return {
+      title: { absolute: 'Tienda No Encontrada | Plataforma Ramos' },
+    }
+  }
+
+  return {
+    title: {
+      absolute: store.name,
+    },
+    description: store.description || `Bienvenido al catálogo digital de ${store.name}`,
+  }
 }
 
 export default async function TenantPage({ params }: TenantPageProps) {

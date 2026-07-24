@@ -8,8 +8,11 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata: Metadata = {
-  title: "Plataforma Ramos",
-  description: "Plataforma de gestión y catálogo multi-tenant",
+  title: {
+    default: "Plataforma Ramos | Tu Propia Tienda Online",
+    template: "%s | Plataforma Ramos",
+  },
+  description: "Plataforma de gestión y catálogo multi-tenant para crear tiendas virtuales y recibir pedidos por WhatsApp.",
 };
 
 export default function RootLayout({
